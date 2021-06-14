@@ -67,7 +67,7 @@ function LoadPlayer(source, char)
             
             print(MRP)
             
-            MRP.update('character', updateObj, query, nil, function(result)
+            MRP.update('character', updateObj, query, {}, function(result)
                 if result.modifiedCount > 0 then
                     phone_number = num
                 else
