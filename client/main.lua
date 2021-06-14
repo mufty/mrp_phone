@@ -234,7 +234,7 @@ RegisterNUICallback('send', function(data)
 end)
 
 RegisterNUICallback('escape', function()
-	MRP.UI.Menu.Close('phone', GetCurrentResourceName(), 'main')
+    ClosePhone()
 end)
 
 Citizen.CreateThread(function()

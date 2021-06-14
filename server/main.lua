@@ -1,18 +1,46 @@
 MRP = nil
 local DisptachRequestId, PhoneNumbers = 0, {}
 
-TriggerEvent('mrp:getSharedObject', function(obj)
-	MRP = obj
+function UsePhoneNumber(phone_number, source, char)
+    TriggerClientEvent('esx_phone:setPhoneNumberSource', -1, phone_number, source)
 
-	local xPlayers = GetPlayers()
+	PhoneNumbers[phone_number] = {
+		type          = 'player',
+		hashDispatch  = false,
+		sharePos      = false,
+		hideNumber    = false,
+		hidePosIfAnon = false,
+		sources       = {[source] = true}
+	}
 
-	for i=1, #xPlayers, 1 do
-		LoadPlayer(xPlayers[i])
+	char.phoneNumber = phone_number
+	local contacts = {}
+
+	if PhoneNumbers[char.job.name] then
+		TriggerEvent('esx_phone:addSource', char.job.name, source)
 	end
-end)
 
-function LoadPlayer(source)
-	local char = MRP.getSpawnedCharacter(source)
+	--[[MySQL.Async.fetchAll('SELECT * FROM user_contacts WHERE identifier = @identifier ORDER BY name ASC', {
+		['@identifier'] = char._id
+	}, function(result2)
+		for i=1, #result2, 1 do
+			table.insert(contacts, {
+				name   = result2[i].name,
+				number = result2[i].number,
+			})
+		end]]--
+
+        --TODO
+		--char.set('contacts', contacts)
+        local contacts = {}
+		TriggerClientEvent('esx_phone:loaded', source, phone_number, contacts)
+	--end)
+end
+
+function LoadPlayer(source, char)
+    if char == nil then
+        char = MRP.getSpawnedCharacter(source)
+    end
 
 	for num,v in pairs(PhoneNumbers) do
 		if tonumber(num) == num then -- if phonenumber is a player phone number
@@ -22,71 +50,58 @@ function LoadPlayer(source)
 		end
 	end
 
-	local phoneNumber = char.phoneNumber
+	local phone_number = char.phoneNumber
 
-	if phoneNumber == nil then
-		phoneNumber = GenerateUniquePhoneNumber()
-
-		MySQL.Async.execute('UPDATE users SET phone_number = @phone_number WHERE identifier = @identifier', {
-			['@identifier']   = char._id,
-			['@phone_number'] = phoneNumber
-		})
+	if phone_number == nil then
+		GenerateUniquePhoneNumber(function(num)
+            print(num)
+            phone_number = num
+            
+            print(MRP)
+            MRP.update('character', {
+                phoneNumber = num
+            }, {
+                stateId = char.stateId
+            }, nil, function(result)
+                if result.modifiedCount > 0 then
+                    phone_number = num
+                else
+                    phone_number = "0"
+                end
+                
+                UsePhoneNumber(phone_number, source, char)
+            end)
+        end)
 	end
-
-	TriggerClientEvent('esx_phone:setPhoneNumberSource', -1, phoneNumber, source)
-
-	PhoneNumbers[phoneNumber] = {
-		type          = 'player',
-		hashDispatch  = false,
-		sharePos      = false,
-		hideNumber    = false,
-		hidePosIfAnon = false,
-		sources       = {[source] = true}
-	}
-
-	char.phoneNumber = phoneNumber
-	local contacts = {}
-
-	if PhoneNumbers[char.job.name] then
-		TriggerEvent('esx_phone:addSource', char.job.name, source)
-	end
-
-	MySQL.Async.fetchAll('SELECT * FROM user_contacts WHERE identifier = @identifier ORDER BY name ASC', {
-		['@identifier'] = char._id
-	}, function(result2)
-		for i=1, #result2, 1 do
-			table.insert(contacts, {
-				name   = result2[i].name,
-				number = result2[i].number,
-			})
-		end
-
-        --TODO
-		--char.set('contacts', contacts)
-        local contacts = {}
-		TriggerClientEvent('esx_phone:loaded', source, phoneNumber, contacts)
-	end)
 end
 
-function GenerateUniquePhoneNumber()
-	local foundNumber, phoneNumber = false, nil
+TriggerEvent('mrp:getSharedObject', function(obj)
+	MRP = obj
 
-	while not foundNumber do
-		Citizen.Wait(100)
+	local xPlayers = GetPlayers()
 
-		math.randomseed(GetGameTimer())
-		phoneNumber = math.random(10000, 99999)
-
-		local result = MySQL.Sync.fetchAll('SELECT COUNT(*) as count FROM users WHERE phone_number = @phoneNumber', {
-			['@phoneNumber'] = phoneNumber
-		})
-
-		if tonumber(result[1].count) == 0 then
-			foundNumber = true
-		end
+	for i=1, #xPlayers, 1 do
+		LoadPlayer(xPlayers[i], nil)
 	end
+end)
 
-	return phoneNumber
+function GenerateUniquePhoneNumber(cb)
+	math.randomseed(GetGameTimer())
+    local numBase0 = math.random(500,599)
+    local numBase1 = math.random(0,999)
+    local numBase2 = math.random(0,9999)
+    local num = string.format("%03d-%03d-%04d", numBase0, numBase1, numBase2)
+
+    MRP.count('character', {
+        phoneNumber = num
+    }, function(count)
+        print(count)
+        if count > 0 then
+            GenerateUniquePhoneNumber(cb)
+        else
+            cb(num)
+        end
+    end)
 end
 
 function GetDistpatchRequestId()
@@ -105,8 +120,8 @@ AddEventHandler('esx_phone:getDistpatchRequestId', function(cb)
 	cb(GetDistpatchRequestId())
 end)
 
-AddEventHandler('esx:playerLoaded', function(playerId)
-	LoadPlayer(playerId)
+AddEventHandler('mrp:spawn', function(source, characterToUse, spawnPoint)
+	LoadPlayer(source, characterToUse)
 end)
 
 AddEventHandler('esx:playerDropped', function(source)

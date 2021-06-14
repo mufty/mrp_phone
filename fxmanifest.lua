@@ -2,9 +2,9 @@ fx_version 'adamant'
 
 game 'gta5'
 
-description 'ESX Phone'
+description 'MRP Phone'
 
-version '1.1.0'
+version '0.0.1'
 
 server_scripts {
 	'config.lua',
