@@ -54,7 +54,6 @@ function LoadPlayer(source, char)
 
 	if phone_number == nil then
 		GenerateUniquePhoneNumber(function(num)
-            print(num)
             phone_number = num
             
             local updateObj = {
@@ -64,8 +63,6 @@ function LoadPlayer(source, char)
             local query =  {
                 stateId = char.stateId
             }
-            
-            print(MRP)
             
             MRP.update('character', updateObj, query, {}, function(result)
                 if result.modifiedCount > 0 then
@@ -102,7 +99,6 @@ function GenerateUniquePhoneNumber(cb)
     MRP.count('character', {
         phoneNumber = num
     }, function(count)
-        print(count)
         if count > 0 then
             GenerateUniquePhoneNumber(cb)
         else
