@@ -3,18 +3,33 @@ local CurrentAction, CurrentActionMsg
 GUI.PhoneIsShowed = false
 GUI.MessagesIsShowed = false
 GUI.AddContactIsShowed = false
-ESX = nil
+MRP = nil
 
 Citizen.CreateThread(function()
-	while ESX == nil do
-		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+	while MRP == nil do
+		TriggerEvent('mrp:getSharedObject', function(obj) MRP = obj end)
 		Citizen.Wait(0)
 	end
 
-	ESX.UI.Menu.RegisterType('phone', OpenPhone, ClosePhone)
+	--MRP.UI.Menu.RegisterType('phone', OpenPhone, ClosePhone)
 end)
 
+RegisterCommand('togglePhone', function()
+    GUI.PhoneIsShowed = not GUI.PhoneIsShowed
+    if GUI.PhoneIsShowed then
+        OpenPhone()
+    else
+        ClosePhone()
+    end
+end, false)
+RegisterKeyMapping('togglePhone', 'Open phone', 'keyboard', 'UP')
+
 function OpenPhone()
+    local char = MRP.GetPlayerData()
+    if char == nil then
+        return
+    end
+    
 	local playerPed = PlayerPedId()
 	TriggerServerEvent('esx_phone:reload', PhoneData.phoneNumber)
 
@@ -25,9 +40,7 @@ function OpenPhone()
 
 	GUI.PhoneIsShowed = true
 
-	ESX.SetTimeout(250, function()
-		SetNuiFocus(true, true)
-	end)
+	SetNuiFocus(true, true)
 
 	if not IsPedInAnyVehicle(playerPed, false) then
 		TaskStartScenarioInPlace(playerPed, 'WORLD_HUMAN_STAND_MOBILE', 0, true)
@@ -116,7 +129,7 @@ RegisterNUICallback('add_contact', function(data, cb)
 	if phoneNumber then
 		TriggerServerEvent('esx_phone:addPlayerContact', phoneNumber, contactName)
 	else
-		ESX.ShowNotification(_U('invalid_number'))
+		MRP.ShowNotification(_U('invalid_number'))
 	end
 end)
 
@@ -140,9 +153,9 @@ AddEventHandler('esx_phone:onMessage', function(phoneNumber, message, position, 
 	end
 
 	if job == 'player' then
-		ESX.ShowNotification(_U('new_message', message))
+		MRP.ShowNotification(_U('new_message', message))
 	else
-		ESX.ShowNotification(('~b~%s:~s~ %s'):format(job, message))
+		MRP.ShowNotification(('~b~%s:~s~ %s'):format(job, message))
 	end
 
 	PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
@@ -170,7 +183,7 @@ AddEventHandler('esx_phone:onMessage', function(phoneNumber, message, position, 
 			job         = job
 		}
 
-		ESX.SetTimeout(15000, function()
+		MRP.SetTimeout(15000, function()
 			CurrentAction = nil
 		end)
 	end
@@ -180,7 +193,7 @@ RegisterNetEvent('esx_phone:stopDispatch')
 AddEventHandler('esx_phone:stopDispatch', function(dispatchRequestId, playerName)
 	if CurrentDispatchRequestId == dispatchRequestId and CurrentAction == 'dispatch' then
 		CurrentAction = nil
-		ESX.ShowNotification(_U('taken_call', playerName))
+		MRP.ShowNotification(_U('taken_call', playerName))
 	end
 end)
 
@@ -195,7 +208,7 @@ end)
 
 RegisterNUICallback('setGPS', function(data)
 	SetNewWaypoint(data.x,  data.y)
-	ESX.ShowNotification(_U('gps_position'))
+	MRP.ShowNotification(_U('gps_position'))
 end)
 
 RegisterNUICallback('send', function(data)
@@ -217,11 +230,11 @@ RegisterNUICallback('send', function(data)
 		showMessageEditor = false
 	})
 
-	ESX.ShowNotification(_U('message_sent'))
+	MRP.ShowNotification(_U('message_sent'))
 end)
 
 RegisterNUICallback('escape', function()
-	ESX.UI.Menu.Close('phone', GetCurrentResourceName(), 'main')
+	MRP.UI.Menu.Close('phone', GetCurrentResourceName(), 'main')
 end)
 
 Citizen.CreateThread(function()
@@ -251,9 +264,9 @@ Citizen.CreateThread(function()
 			-- open phone
 			-- todo: is player busy (handcuffed, etc)
 			if IsControlJustReleased(0, 288) and IsInputDisabled(0) then
-				if not ESX.UI.Menu.IsOpen('phone', GetCurrentResourceName(), 'main') then
-					ESX.UI.Menu.CloseAll()
-					ESX.UI.Menu.Open('phone', GetCurrentResourceName(), 'main')
+				if not MRP.UI.Menu.IsOpen('phone', GetCurrentResourceName(), 'main') then
+					MRP.UI.Menu.CloseAll()
+					MRP.UI.Menu.Open('phone', GetCurrentResourceName(), 'main')
 				end
 			end
 		end
@@ -263,7 +276,7 @@ end)
 AddEventHandler('onResourceStop', function(resource)
 	if resource == GetCurrentResourceName() then
 		if GUI.PhoneIsShowed then
-			ESX.UI.Menu.CloseAll()
+			MRP.UI.Menu.CloseAll()
 		end
 	end
 end)
@@ -274,7 +287,7 @@ Citizen.CreateThread(function()
 		Citizen.Wait(0)
 
 		if CurrentAction then
-			ESX.ShowHelpNotification(CurrentActionMsg)
+			MRP.ShowHelpNotification(CurrentActionMsg)
 
 			if IsControlJustReleased(0, 38) and IsInputDisabled(0) then
 				if CurrentAction == 'dispatch' then

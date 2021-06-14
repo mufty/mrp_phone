@@ -7,9 +7,8 @@ description 'ESX Phone'
 version '1.1.0'
 
 server_scripts {
-	'@mysql-async/lib/MySQL.lua',
 	'config.lua',
-	'@es_extended/locale.lua',
+	'@mrp_core/shared/locale.lua',
 	'locales/de.lua',
 	'locales/br.lua',
 	'locales/en.lua',
@@ -21,7 +20,7 @@ server_scripts {
 }
 
 client_scripts {
-	'@es_extended/locale.lua',
+	'@mrp_core/shared/locale.lua',
 	'config.lua',
 	'locales/de.lua',
 	'locales/br.lua',
@@ -33,15 +32,15 @@ client_scripts {
 	'client/main.lua'
 }
 
-ui_page 'html/ui.html'
+ui_page 'html/ui_en.html'
 
 files {
-	'html/ui.html',
+	'html/ui_en.html',
 
 	'html/css/app.css',
 
 	'html/scripts/mustache.min.js',
-	'html/scripts/app.js',
+	'html/scripts/app_en.js',
 
 	'html/img/phone.png',
 
@@ -57,4 +56,4 @@ files {
 	'html/img/icons/location.png'
 }
 
-dependency 'es_extended'
+dependency 'mrp_core'
