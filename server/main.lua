@@ -57,12 +57,17 @@ function LoadPlayer(source, char)
             print(num)
             phone_number = num
             
-            print(MRP)
-            MRP.update('character', {
+            local updateObj = {
                 phoneNumber = num
-            }, {
+            }
+            
+            local query =  {
                 stateId = char.stateId
-            }, nil, function(result)
+            }
+            
+            print(MRP)
+            
+            MRP.update('character', updateObj, query, nil, function(result)
                 if result.modifiedCount > 0 then
                     phone_number = num
                 else
@@ -72,6 +77,8 @@ function LoadPlayer(source, char)
                 UsePhoneNumber(phone_number, source, char)
             end)
         end)
+    else
+        UsePhoneNumber(phone_number, source, char)
 	end
 end
 
