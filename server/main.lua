@@ -14,27 +14,16 @@ function UsePhoneNumber(phone_number, source, char)
 	}
 
 	char.phoneNumber = phone_number
-	local contacts = {}
-
-	if PhoneNumbers[char.job.name] then
-		TriggerEvent('esx_phone:addSource', char.job.name, source)
-	end
-
-	--[[MySQL.Async.fetchAll('SELECT * FROM user_contacts WHERE identifier = @identifier ORDER BY name ASC', {
-		['@identifier'] = char._id
-	}, function(result2)
-		for i=1, #result2, 1 do
-			table.insert(contacts, {
-				name   = result2[i].name,
-				number = result2[i].number,
-			})
-		end]]--
-
-        --TODO
-		--char.set('contacts', contacts)
-        local contacts = {}
-		TriggerClientEvent('esx_phone:loaded', source, phone_number, contacts)
-	--end)
+    TriggerEvent('mrp:updateCharacter', char)
+    TriggerClientEvent('mrp:updateCharacter', source, char)
+    
+    MRP.read('phone', {phoneNumber = phone_number}, function(res)
+        if PhoneNumbers[char.job.name] then
+    		TriggerEvent('esx_phone:addSource', char.job.name, source)
+    	end
+        
+        TriggerClientEvent('esx_phone:loaded', source, phone_number, res.contacts)
+    end)
 end
 
 function LoadPlayer(source, char)
@@ -71,7 +60,14 @@ function LoadPlayer(source, char)
                     phone_number = "0"
                 end
                 
-                UsePhoneNumber(phone_number, source, char)
+                if phone_number ~= "0" then
+                    --create a new phone in DB
+                    MRP.update('phone', {phoneNumber = phone_number, contacts = {}}, {phoneNumber = phone_number}, {upsert=true}, function(res)
+                        UsePhoneNumber(phone_number, source, char)
+                    end)
+                else
+                    UsePhoneNumber(phone_number, source, char)
+                end
             end)
         end)
     else
@@ -127,15 +123,15 @@ AddEventHandler('mrp:spawn', function(source, characterToUse, spawnPoint)
 	LoadPlayer(source, characterToUse)
 end)
 
-AddEventHandler('esx:playerDropped', function(source)
-	local xPlayer = MRP.GetPlayerFromId(source)
-	local phoneNumber = xPlayer.get('phoneNumber')
+AddEventHandler('playerDropped', function(reason)
+	local char = MRP.getSpawnedCharacter(source)
+	local phoneNumber = char.phoneNumber
 
 	TriggerClientEvent('esx_phone:setPhoneNumberSource', -1, phoneNumber, -1)
 	PhoneNumbers[phoneNumber] = nil
 
-	if PhoneNumbers[xPlayer.job.name] then
-		TriggerEvent('esx_phone:removeSource', xPlayer.job.name, source)
+	if PhoneNumbers[char.job.name] then
+		TriggerEvent('esx_phone:removeSource', char.job.name, source)
 	end
 end)
 
@@ -150,20 +146,19 @@ AddEventHandler('esx:setJob', function(source, job, lastJob)
 end)
 
 RegisterServerEvent('esx_phone:reload')
-AddEventHandler('esx_phone:reload', function(phoneNumber)
+AddEventHandler('esx_phone:reload', function(phone_number)
+    local playerId = source
     local char = MRP.getSpawnedCharacter(source)
-    --TODO
-	--local xPlayer  = MRP.GetPlayerFromId(playerId)
-	--local contacts = xPlayer.get('contacts')
-    local contacts = {}
-
-	TriggerClientEvent('esx_phone:loaded', source, char.phoneNumber, contacts)
+    
+    MRP.read('phone', {phoneNumber = phone_number}, function(res)
+        TriggerClientEvent('esx_phone:loaded', playerId, phone_number, res.contacts)
+    end)
 end)
 
 RegisterServerEvent('esx_phone:send')
 AddEventHandler('esx_phone:send', function(phoneNumber, message, anon, position)
-	local xPlayer = MRP.GetPlayerFromId(source)
-	print(('esx_phone: MESSAGE => %s@%s: %s'):format(xPlayer.name, phoneNumber, message))
+	local xPlayer = MRP.getSpawnedCharacter(source)
+	print(('esx_phone: MESSAGE => %s %s@%s: %s'):format(xPlayer.name, xPlayer.surname, phoneNumber, message))
 
 	if PhoneNumbers[phoneNumber] then
 		for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
@@ -179,9 +174,9 @@ AddEventHandler('esx_phone:send', function(phoneNumber, message, anon, position)
 			end
 
 			if numHasDispatch then
-				TriggerClientEvent('esx_phone:onMessage', numSource, xPlayer.get('phoneNumber'), message, numPosition, (numHide and true or anon), numType, GetDistpatchRequestId(), phoneNumber)
+				TriggerClientEvent('esx_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, (numHide and true or anon), numType, GetDistpatchRequestId(), phoneNumber)
 			else
-				TriggerClientEvent('esx_phone:onMessage', numSource, xPlayer.get('phoneNumber'), message, numPosition, (numHide and true or anon), numType, false)
+				TriggerClientEvent('esx_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, (numHide and true or anon), numType, false)
 			end
 		end
 	end
@@ -214,56 +209,43 @@ AddEventHandler('esx_phone:removeSource', function(number, source)
 end)
 
 RegisterServerEvent('esx_phone:addPlayerContact')
-AddEventHandler('esx_phone:addPlayerContact', function(phoneNumber, contactName)
+AddEventHandler('esx_phone:addPlayerContact', function(phone_number, contactName)
 	local playerId = source
-	local xPlayer = MRP.GetPlayerFromId(playerId)
-	phoneNumber = tonumber(phoneNumber)
+	local xPlayer = MRP.getSpawnedCharacter(playerId)
 	local playerOnline = false
 
-	if phoneNumber == nil then
-		print(('esx_phone: %s parsed invalid player contact number!'):format(xPlayer.identifier))
+	if phone_number == nil then
+		print(('esx_phone: %s parsed invalid player contact number!'):format(xPlayer.surname))
 		return
 	end
 
-	MySQL.Async.fetchAll('SELECT phone_number, identifier FROM users WHERE phone_number = @number', {
-		['@number'] = phoneNumber
-	}, function(result)
-		if result[1] then
-			if phoneNumber == xPlayer.get('phoneNumber') then
-				TriggerClientEvent('esx:showNotification', playerId, _U('cannot_add_self'))
+    MRP.read('phone', {phoneNumber = phone_number}, function(result)
+		if result ~= nil then
+			if phone_number == xPlayer.phoneNumber then
+				TriggerClientEvent('mrp:showNotification', playerId, _U('cannot_add_self'))
 			else
-				local contacts  = xPlayer.get('contacts')
+				local contacts  = result.contacts
 
 				-- already added player?
 				for i=1, #contacts, 1 do
-					if contacts[i].number == phoneNumber then
-						TriggerClientEvent('esx:showNotification', playerId, _U('number_in_contacts'))
+					if contacts[i].number == phone_number then
+						TriggerClientEvent('mrp:showNotification', playerId, _U('number_in_contacts'))
 						return
 					end
 				end
 
 				table.insert(contacts, {
 					name   = contactName,
-					number = phoneNumber
+					number = phone_number
 				})
-
-				xPlayer.set('contacts', contacts)
-
-				-- is the player currently online?
-				local xTarget = MRP.GetPlayerFromIdentifier(result[1].identifier)
-				playerOnline = xTarget ~= nil
-
-				MySQL.Async.execute('INSERT INTO user_contacts (identifier, name, number) VALUES (@identifier, @name, @number)', {
-					['@identifier'] = xPlayer.identifier,
-					['@name']       = contactName,
-					['@number']     = phoneNumber
-				}, function(rowsChanged)
-					TriggerClientEvent('esx:showNotification', playerId, _U('contact_added'))
-					TriggerClientEvent('esx_phone:addContact', playerId, contactName, phoneNumber, playerOnline)
-				end)
+                
+                MRP.update('phone', {phoneNumber = xPlayer.phoneNumber, contacts = contacts}, {phoneNumber = xPlayer.phoneNumber}, {upsert=true}, function(res)
+                    TriggerClientEvent('esx:showNotification', playerId, _U('contact_added'))
+					TriggerClientEvent('esx_phone:addContact', playerId, contactName, phone_number, true)
+                end)
 			end
 		else
-			TriggerClientEvent('esx:showNotification', playerId, _U('number_not_assigned'))
+			TriggerClientEvent('mrp:showNotification', playerId, _U('number_not_assigned'))
 		end
 	end)
 end)

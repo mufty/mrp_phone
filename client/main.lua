@@ -123,19 +123,19 @@ AddEventHandler('esx_phone:removeSpecialContact', function(phoneNumber)
 end)
 
 RegisterNUICallback('add_contact', function(data, cb)
-	local phoneNumber = tonumber(data.phoneNumber)
-	local contactName = tostring(data.contactName)
+	local phoneNumber = data.phoneNumber
+	local contactName = data.contactName
 
 	if phoneNumber then
 		TriggerServerEvent('esx_phone:addPlayerContact', phoneNumber, contactName)
 	else
-		MRP.ShowNotification(_U('invalid_number'))
+		MRP.Notification(_U('invalid_number'), 10000)
 	end
 end)
 
 RegisterNUICallback('remove_contact', function(data, cb)
-	local phoneNumber = tonumber(data.phoneNumber)
-	local contactName = tostring(data.contactName)
+	local phoneNumber = data.phoneNumber
+	local contactName = data.contactName
 
 	if phoneNumber then
 		TriggerServerEvent('esx_phone:removePlayerContact', phoneNumber, contactName)
@@ -153,9 +153,9 @@ AddEventHandler('esx_phone:onMessage', function(phoneNumber, message, position, 
 	end
 
 	if job == 'player' then
-		MRP.ShowNotification(_U('new_message', message))
+        MRP.Notification(_U('invalid_number', message), 10000)
 	else
-		MRP.ShowNotification(('~b~%s:~s~ %s'):format(job, message))
+        MRP.Notification(('~b~%s:~s~ %s'):format(job, message), 10000)
 	end
 
 	PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
@@ -193,7 +193,7 @@ RegisterNetEvent('esx_phone:stopDispatch')
 AddEventHandler('esx_phone:stopDispatch', function(dispatchRequestId, playerName)
 	if CurrentDispatchRequestId == dispatchRequestId and CurrentAction == 'dispatch' then
 		CurrentAction = nil
-		MRP.ShowNotification(_U('taken_call', playerName))
+		MRP.Notification(_U('taken_call', playerName), 10000)
 	end
 end)
 
@@ -208,7 +208,7 @@ end)
 
 RegisterNUICallback('setGPS', function(data)
 	SetNewWaypoint(data.x,  data.y)
-	MRP.ShowNotification(_U('gps_position'))
+	MRP.Notification(_U('gps_position'), 10000)
 end)
 
 RegisterNUICallback('send', function(data)
@@ -230,7 +230,7 @@ RegisterNUICallback('send', function(data)
 		showMessageEditor = false
 	})
 
-	MRP.ShowNotification(_U('message_sent'))
+	MRP.Notification(_U('message_sent'), 10000)
 end)
 
 RegisterNUICallback('escape', function()
