@@ -142,6 +142,23 @@ RegisterNUICallback('remove_contact', function(data, cb)
 	end
 end)
 
+RegisterNUICallback('start_call', function(data, cb)
+	local phoneNumber = data.phoneNumber
+	local contactName = data.contactName
+
+	--[[if phoneNumber then
+		TriggerServerEvent('mrp_phone:startCall', phoneNumber, contactName)
+	end]]--
+end)
+
+RegisterNetEvent('mrp_phone:loadTextMessages')
+AddEventHandler('mrp_phone:loadTextMessages', function(messages)
+    SendNUIMessage({
+		fillMessages  = true,
+		messages = messages,
+	})
+end)
+
 RegisterNetEvent('mrp_phone:onMessage')
 AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, position, anon, job, dispatchRequestId, dispatchNumber)
 	if dispatchNumber and phoneNumber == PhoneData.phoneNumber then

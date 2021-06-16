@@ -23,6 +23,10 @@ function UsePhoneNumber(phone_number, source, char)
     	end
         
         TriggerClientEvent('mrp_phone:loaded', source, phone_number, res.contacts)
+        
+        --[[MRP.find('phone_message', {phoneNumber = phone_number}, {sort = 'date'}, {skip = false, limit = false}, function(res)
+            TriggerClientEvent('mrp_phone:loadTextMessages', source, res)
+        end)]]--
     end)
 end
 
@@ -160,6 +164,10 @@ AddEventHandler('mrp_phone:reload', function(phone_number)
         else
             TriggerClientEvent('mrp:showNotification', playerId, _U('get_contacts_error'))
         end
+        
+        MRP.find('phone_message', {phoneNumber = phone_number}, {sort = 'date'}, {skip = false, limit = false}, function(res)
+            TriggerClientEvent('mrp_phone:loadTextMessages', playerId, res)
+        end)
     end)
 end)
 

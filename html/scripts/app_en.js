@@ -22,7 +22,7 @@ $(function() {
         '</div>' +
         '</div>' +
         '<div class="body">{{message}}</div>' +
-        '<div class="actions"><span class="new-msg {{anonyme}} reply-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span><span class="gps {{activeGPS}} gps-btn" data-gpsX="{{gpsLocationX}}" data-gpsY="{{gpsLocationY}}"></span><span class="ok-btn {{showOK}}" data-contact-number="{{okNumberData}}" data-contact-job="{{jobData}}"></span></div>' +
+        '<div class="actions"><span class="new-msg {{anonyme}} reply-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span><span class="gps gps-btn"></span></div>' +
         '</div>';
 
     let SpecialContactTpl = '<li class="phone-icon" style="background-image: url(\'{{base64Icon}}\');" data-number="{{number}}" data-name="{{name}}">{{name}}</li>';
@@ -135,6 +135,15 @@ $(function() {
             showNewMessage($(this).attr('data-contact-number'), $(this).attr('data-contact-name'));
         });
 
+        $('.contact .new-call').click(function() {
+            let name = $(this).attr('data-contact-name');
+            let phoneNumber = $(this).attr('data-contact-number');
+
+            $.post('http://mrp_phone/start_call', JSON.stringify({
+                contactName: name,
+                phoneNumber: phoneNumber
+            }))
+        });
     }
 
     $('.contact .new-msg').click(function() {
@@ -187,19 +196,13 @@ $(function() {
         if (messages.length > 0) {
 
             for (let i = 0; i < messages.length; i++) {
-
                 let fromName = "Unknown";
                 let fromNumber = messages[i].value;
                 let anonyme = null;
 
-                if (messages[i].job != "player")
-                    fromName = messages[i].job;
-
                 if (messages[i].anonyme) {
 
-                    if (messages[i].job == "player")
-                        fromName = "Anonymous";
-
+                    fromName = "Anonymous";
                     fromNumber = "Anonymous";
                     anonyme = 'anonyme';
 
@@ -207,8 +210,7 @@ $(function() {
 
                     for (let j = 0; j < contacts.length; j++)
                         if (contacts[j].value == messages[i].value)
-                            if (messages[i].job == "player")
-                                fromName = contacts[j].label;
+                            fromName = contacts[j].label;
 
                     anonyme = '';
                 }
@@ -219,13 +221,7 @@ $(function() {
                     sender: fromName,
                     message: messages[i].message,
                     phoneNumberData: fromNumber,
-                    senderData: fromName,
-                    okNumberData: fromNumber,
-                    gpsLocationX: (messages[i].job == 'player') ? '' : messages[i].position.x,
-                    gpsLocationY: (messages[i].job == 'player') ? '' : messages[i].position.y,
-                    activeGPS: (messages[i].job == 'player') ? '' : (messages[i].position) ? 'active' : '',
-                    jobData: (messages[i].job == 'player') ? '' : messages[i].job,
-                    showOK: (messages[i].job == 'player') ? '' : 'showOK'
+                    senderData: fromName
                 }
 
                 let html = Mustache.render(MessageTpl, view);
@@ -244,14 +240,6 @@ $(function() {
 
         $('.message .gps').click(function() {
             showGPS($(this).attr('data-gpsX'), $(this).attr('data-gpsY'));
-        });
-
-        $('.message .ok-btn').click(function() {
-            $.post('http://mrp_phone/send', JSON.stringify({
-                message: $(this).attr('data-contact-job') + ": Received!",
-                number: $(this).attr('data-contact-number'),
-                anonyme: false
-            }))
         });
     }
 
@@ -455,6 +443,14 @@ $(function() {
 
         if (data.newMessage === true) {
             addMessage(data.phoneNumber, data.message, data.position, data.anonyme, data.job);
+        }
+
+        if (data.fillMessages === true) {
+            if (data.messages && data.messages.length > 0) {
+                for (let message of data.messages) {
+                    addMessage(message.from, message.message, null, message.from == "anonymous", null);
+                }
+            }
         }
 
         if (data.contactAdded === true) {
