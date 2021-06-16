@@ -31,7 +31,7 @@ function OpenPhone()
     end
     
 	local playerPed = PlayerPedId()
-	TriggerServerEvent('esx_phone:reload', PhoneData.phoneNumber)
+	TriggerServerEvent('mrp_phone:reload', PhoneData.phoneNumber)
 
 	SendNUIMessage({
 		showPhone = true,
@@ -59,8 +59,8 @@ function ClosePhone()
 	ClearPedTasks(playerPed)
 end
 
-RegisterNetEvent('esx_phone:loaded')
-AddEventHandler('esx_phone:loaded', function(phoneNumber, contacts)
+RegisterNetEvent('mrp_phone:loaded')
+AddEventHandler('mrp_phone:loaded', function(phoneNumber, contacts)
 	PhoneData.phoneNumber = phoneNumber
 	PhoneData.contacts = {}
 
@@ -75,8 +75,8 @@ AddEventHandler('esx_phone:loaded', function(phoneNumber, contacts)
 	})
 end)
 
-RegisterNetEvent('esx_phone:addContact')
-AddEventHandler('esx_phone:addContact', function(name, phoneNumber, playerOnline)
+RegisterNetEvent('mrp_phone:addContact')
+AddEventHandler('mrp_phone:addContact', function(name, phoneNumber, playerOnline)
 	table.insert(PhoneData.contacts, {
 		name   = name,
 		number = phoneNumber,
@@ -89,8 +89,8 @@ AddEventHandler('esx_phone:addContact', function(name, phoneNumber, playerOnline
 	})
 end)
 
-RegisterNetEvent('esx_phone:removeContact')
-AddEventHandler('esx_phone:removeContact', function(name, phoneNumber)
+RegisterNetEvent('mrp_phone:removeContact')
+AddEventHandler('mrp_phone:removeContact', function(name, phoneNumber)
 	for key, value in pairs(PhoneData.contacts) do
 		if value.name == name and value.number == phoneNumber then
 			table.remove(PhoneData.contacts, key)
@@ -104,8 +104,8 @@ AddEventHandler('esx_phone:removeContact', function(name, phoneNumber)
 	})
 end)
 
-RegisterNetEvent('esx_phone:addSpecialContact')
-AddEventHandler('esx_phone:addSpecialContact', function(name, phoneNumber, base64Icon)
+RegisterNetEvent('mrp_phone:addSpecialContact')
+AddEventHandler('mrp_phone:addSpecialContact', function(name, phoneNumber, base64Icon)
 	SendNUIMessage({
 		addSpecialContact = true,
 		name              = name,
@@ -114,8 +114,8 @@ AddEventHandler('esx_phone:addSpecialContact', function(name, phoneNumber, base6
 	})
 end)
 
-RegisterNetEvent('esx_phone:removeSpecialContact')
-AddEventHandler('esx_phone:removeSpecialContact', function(phoneNumber)
+RegisterNetEvent('mrp_phone:removeSpecialContact')
+AddEventHandler('mrp_phone:removeSpecialContact', function(phoneNumber)
 	SendNUIMessage({
 		removeSpecialContact = true,
 		number               = phoneNumber
@@ -127,7 +127,7 @@ RegisterNUICallback('add_contact', function(data, cb)
 	local contactName = data.contactName
 
 	if phoneNumber then
-		TriggerServerEvent('esx_phone:addPlayerContact', phoneNumber, contactName)
+		TriggerServerEvent('mrp_phone:addPlayerContact', phoneNumber, contactName)
 	else
 		MRP.Notification(_U('invalid_number'), 10000)
 	end
@@ -138,14 +138,14 @@ RegisterNUICallback('remove_contact', function(data, cb)
 	local contactName = data.contactName
 
 	if phoneNumber then
-		TriggerServerEvent('esx_phone:removePlayerContact', phoneNumber, contactName)
+		TriggerServerEvent('mrp_phone:removePlayerContact', phoneNumber, contactName)
 	end
 end)
 
-RegisterNetEvent('esx_phone:onMessage')
-AddEventHandler('esx_phone:onMessage', function(phoneNumber, message, position, anon, job, dispatchRequestId, dispatchNumber)
+RegisterNetEvent('mrp_phone:onMessage')
+AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, position, anon, job, dispatchRequestId, dispatchNumber)
 	if dispatchNumber and phoneNumber == PhoneData.phoneNumber then
-		TriggerEvent('esx_phone:cancelMessage', dispatchNumber)
+		TriggerEvent('mrp_phone:cancelMessage', dispatchNumber)
 
 		if WasEventCanceled() then
 			return
@@ -189,16 +189,16 @@ AddEventHandler('esx_phone:onMessage', function(phoneNumber, message, position, 
 	end
 end)
 
-RegisterNetEvent('esx_phone:stopDispatch')
-AddEventHandler('esx_phone:stopDispatch', function(dispatchRequestId, playerName)
+RegisterNetEvent('mrp_phone:stopDispatch')
+AddEventHandler('mrp_phone:stopDispatch', function(dispatchRequestId, playerName)
 	if CurrentDispatchRequestId == dispatchRequestId and CurrentAction == 'dispatch' then
 		CurrentAction = nil
 		MRP.Notification(_U('taken_call', playerName), 10000)
 	end
 end)
 
-RegisterNetEvent('esx_phone:setPhoneNumberSource')
-AddEventHandler('esx_phone:setPhoneNumberSource', function(phoneNumber, source)
+RegisterNetEvent('mrp_phone:setPhoneNumberSource')
+AddEventHandler('mrp_phone:setPhoneNumberSource', function(phoneNumber, source)
 	if source == -1 then
 		PhoneNumberSources[phoneNumber] = nil
 	else
@@ -206,8 +206,8 @@ AddEventHandler('esx_phone:setPhoneNumberSource', function(phoneNumber, source)
 	end
 end)
 
-RegisterNetEvent('esx_phone:flashNumber')
-AddEventHandler('esx_phone:flashNumber', function()
+RegisterNetEvent('mrp_phone:flashNumber')
+AddEventHandler('mrp_phone:flashNumber', function()
 	local char = MRP.GetPlayerData()
     if char == nil then
         return
@@ -225,7 +225,7 @@ AddEventHandler('esx_phone:flashNumber', function()
             if dist <= Config.FlashNumberArea then
                 local serverId = GetPlayerServerId(playerHandle)
                 
-                TriggerServerEvent('esx_phone:broadcastNumber', GetPlayerServerId(PlayerId()), serverId, char.name .. ' ' .. char.surname, char.phoneNumber);
+                TriggerServerEvent('mrp_phone:broadcastNumber', GetPlayerServerId(PlayerId()), serverId, char.name .. ' ' .. char.surname, char.phoneNumber);
             end
         end
 	end
@@ -245,7 +245,7 @@ RegisterNUICallback('send', function(data)
 		phoneNumber = tonumber(phoneNumber)
 	end
 
-	TriggerServerEvent('esx_phone:send', phoneNumber, data.message, data.anonyme, {
+	TriggerServerEvent('mrp_phone:send', phoneNumber, data.message, data.anonyme, {
 		x = coords.x,
 		y = coords.y,
 		z = coords.z
@@ -307,7 +307,7 @@ Citizen.CreateThread(function()
 
 			if IsControlJustReleased(0, 38) and IsInputDisabled(0) then
 				if CurrentAction == 'dispatch' then
-					TriggerServerEvent('esx_phone:stopDispatch', CurrentDispatchRequestId)
+					TriggerServerEvent('mrp_phone:stopDispatch', CurrentDispatchRequestId)
 					SetNewWaypoint(CurrentActionData.position.x, CurrentActionData.position.y)
 				end
 

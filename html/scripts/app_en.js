@@ -131,13 +131,13 @@ $(function() {
             }))
         });
 
-        $('.contact.online .new-msg').click(function() {
+        $('.contact .new-msg').click(function() {
             showNewMessage($(this).attr('data-contact-number'), $(this).attr('data-contact-name'));
         });
 
     }
 
-    $('.contact.online .new-msg').click(function() {
+    $('.contact .new-msg').click(function() {
         showNewMessage($(this).attr('data-contact-number'));
     });
 

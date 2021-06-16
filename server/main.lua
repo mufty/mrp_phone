@@ -2,7 +2,7 @@ MRP = nil
 local DisptachRequestId, PhoneNumbers = 0, {}
 
 function UsePhoneNumber(phone_number, source, char)
-    TriggerClientEvent('esx_phone:setPhoneNumberSource', -1, phone_number, source)
+    TriggerClientEvent('mrp_phone:setPhoneNumberSource', -1, phone_number, source)
 
 	PhoneNumbers[phone_number] = {
 		type          = 'player',
@@ -19,10 +19,10 @@ function UsePhoneNumber(phone_number, source, char)
     
     MRP.read('phone', {phoneNumber = phone_number}, function(res)
         if PhoneNumbers[char.job.name] then
-    		TriggerEvent('esx_phone:addSource', char.job.name, source)
+    		TriggerEvent('mrp_phone:addSource', char.job.name, source)
     	end
         
-        TriggerClientEvent('esx_phone:loaded', source, phone_number, res.contacts)
+        TriggerClientEvent('mrp_phone:loaded', source, phone_number, res.contacts)
     end)
 end
 
@@ -34,7 +34,7 @@ function LoadPlayer(source, char)
 	for num,v in pairs(PhoneNumbers) do
 		if tonumber(num) == num then -- if phonenumber is a player phone number
 			for src,_ in pairs(v.sources) do
-				TriggerClientEvent('esx_phone:setPhoneNumberSource', source, num, tonumber(src))
+				TriggerClientEvent('mrp_phone:setPhoneNumberSource', source, num, tonumber(src))
 			end
 		end
 	end
@@ -115,7 +115,7 @@ function GetDistpatchRequestId()
 	return requestId
 end
 
-AddEventHandler('esx_phone:getDistpatchRequestId', function(cb)
+AddEventHandler('mrp_phone:getDistpatchRequestId', function(cb)
 	cb(GetDistpatchRequestId())
 end)
 
@@ -127,26 +127,26 @@ AddEventHandler('playerDropped', function(reason)
 	local char = MRP.getSpawnedCharacter(source)
 	local phoneNumber = char.phoneNumber
 
-	TriggerClientEvent('esx_phone:setPhoneNumberSource', -1, phoneNumber, -1)
+	TriggerClientEvent('mrp_phone:setPhoneNumberSource', -1, phoneNumber, -1)
 	PhoneNumbers[phoneNumber] = nil
 
 	if PhoneNumbers[char.job.name] then
-		TriggerEvent('esx_phone:removeSource', char.job.name, source)
+		TriggerEvent('mrp_phone:removeSource', char.job.name, source)
 	end
 end)
 
 AddEventHandler('esx:setJob', function(source, job, lastJob)
 	if PhoneNumbers[lastJob.name] then
-		TriggerEvent('esx_phone:removeSource', lastJob.name, source)
+		TriggerEvent('mrp_phone:removeSource', lastJob.name, source)
 	end
 
 	if PhoneNumbers[job.name] then
-		TriggerEvent('esx_phone:addSource', job.name, source)
+		TriggerEvent('mrp_phone:addSource', job.name, source)
 	end
 end)
 
-RegisterServerEvent('esx_phone:reload')
-AddEventHandler('esx_phone:reload', function(phone_number)
+RegisterServerEvent('mrp_phone:reload')
+AddEventHandler('mrp_phone:reload', function(phone_number)
     local playerId = source
     local char = MRP.getSpawnedCharacter(source)
     
@@ -156,41 +156,62 @@ AddEventHandler('esx_phone:reload', function(phone_number)
     
     MRP.read('phone', {phoneNumber = phone_number}, function(res)
         if res ~= nil then
-            TriggerClientEvent('esx_phone:loaded', playerId, phone_number, res.contacts)
+            TriggerClientEvent('mrp_phone:loaded', playerId, phone_number, res.contacts)
         else
             TriggerClientEvent('mrp:showNotification', playerId, _U('get_contacts_error'))
         end
     end)
 end)
 
-RegisterServerEvent('esx_phone:send')
-AddEventHandler('esx_phone:send', function(phoneNumber, message, anon, position)
+RegisterServerEvent('mrp_phone:send')
+AddEventHandler('mrp_phone:send', function(phoneNumber, message, anon, position)
 	local xPlayer = MRP.getSpawnedCharacter(source)
-	print(('esx_phone: MESSAGE => %s %s@%s: %s'):format(xPlayer.name, xPlayer.surname, phoneNumber, message))
-
-	if PhoneNumbers[phoneNumber] then
-		for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
-			local numType          = PhoneNumbers[phoneNumber].type
-			local numHasDispatch   = PhoneNumbers[phoneNumber].hasDispatch
-			local numHide          = PhoneNumbers[phoneNumber].hideNumber
-			local numHidePosIfAnon = PhoneNumbers[phoneNumber].hidePosIfAnon
-			local numPosition      = (PhoneNumbers[phoneNumber].sharePos and position or false)
-			local numSource        = tonumber(k)
-
-			if numHidePosIfAnon and anon then
-				numPosition = false
-			end
-
-			if numHasDispatch then
-				TriggerClientEvent('esx_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, (numHide and true or anon), numType, GetDistpatchRequestId(), phoneNumber)
-			else
-				TriggerClientEvent('esx_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, (numHide and true or anon), numType, false)
-			end
-		end
-	end
+	print(('mrp_phone: MESSAGE => %s %s => %s: %s'):format(xPlayer.name, xPlayer.surname, phoneNumber, message))
+    
+    MRP.read('phone', {phoneNumber = phoneNumber}, function(phone)
+        if phone == nil then
+            return
+        end
+        
+        local sender = xPlayer.phoneNumber
+        if anon then
+            sender = _U('annonymous')
+        end
+        
+        local msgObj = {
+            message = message,
+            from = sender,
+            seen = false,
+            date = os.time(os.date("!*t")),
+            phoneNumber = phoneNumber,
+        }
+        
+        MRP.create('phone_message', msgObj, function(res)
+            if PhoneNumbers[phoneNumber] then
+                for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
+        			local numType          = PhoneNumbers[phoneNumber].type
+        			local numHasDispatch   = PhoneNumbers[phoneNumber].hasDispatch
+        			local numHide          = PhoneNumbers[phoneNumber].hideNumber
+        			local numHidePosIfAnon = PhoneNumbers[phoneNumber].hidePosIfAnon
+        			local numPosition      = (PhoneNumbers[phoneNumber].sharePos and position or false)
+        			local numSource        = tonumber(k)
+        
+        			if numHidePosIfAnon and anon then
+        				numPosition = false
+        			end
+        
+        			if numHasDispatch then
+        				TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, (numHide and true or anon), numType, GetDistpatchRequestId(), phoneNumber)
+        			else
+        				TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, (numHide and true or anon), numType, false)
+        			end
+        		end
+            end
+        end)
+    end)
 end)
 
-AddEventHandler('esx_phone:registerNumber', function(number, type, sharePos, hasDispatch, hideNumber, hidePosIfAnon)
+AddEventHandler('mrp_phone:registerNumber', function(number, type, sharePos, hasDispatch, hideNumber, hidePosIfAnon)
 	local hideNumber    = hideNumber    or false
 	local hidePosIfAnon = hidePosIfAnon or false
 
@@ -204,26 +225,25 @@ AddEventHandler('esx_phone:registerNumber', function(number, type, sharePos, has
 	}
 end)
 
-AddEventHandler('esx_phone:removeNumber', function(number)
+AddEventHandler('mrp_phone:removeNumber', function(number)
 	PhoneNumbers[number] = nil
 end)
 
-AddEventHandler('esx_phone:addSource', function(number, source)
+AddEventHandler('mrp_phone:addSource', function(number, source)
 	PhoneNumbers[number].sources[tostring(source)] = true
 end)
 
-AddEventHandler('esx_phone:removeSource', function(number, source)
+AddEventHandler('mrp_phone:removeSource', function(number, source)
 	PhoneNumbers[number].sources[tostring(source)] = nil
 end)
 
-RegisterServerEvent('esx_phone:addPlayerContact')
-AddEventHandler('esx_phone:addPlayerContact', function(phone_number, contactName)
+RegisterServerEvent('mrp_phone:addPlayerContact')
+AddEventHandler('mrp_phone:addPlayerContact', function(phone_number, contactName)
 	local playerId = source
 	local xPlayer = MRP.getSpawnedCharacter(playerId)
-	local playerOnline = false
 
 	if phone_number == nil then
-		print(('esx_phone: %s parsed invalid player contact number!'):format(xPlayer.surname))
+		print(('mrp_phone: %s parsed invalid player contact number!'):format(xPlayer.surname))
 		return
 	end
 
@@ -249,7 +269,7 @@ AddEventHandler('esx_phone:addPlayerContact', function(phone_number, contactName
                 
                 MRP.update('phone', {phoneNumber = xPlayer.phoneNumber, contacts = contacts}, {phoneNumber = xPlayer.phoneNumber}, {upsert=true}, function(res)
                     TriggerClientEvent('esx:showNotification', playerId, _U('contact_added'))
-					TriggerClientEvent('esx_phone:addContact', playerId, contactName, phone_number, true)
+					TriggerClientEvent('mrp_phone:addContact', playerId, contactName, phone_number, true)
                 end)
 			end
 		else
@@ -258,8 +278,8 @@ AddEventHandler('esx_phone:addPlayerContact', function(phone_number, contactName
 	end)
 end)
 
-RegisterServerEvent('esx_phone:removePlayerContact')
-AddEventHandler('esx_phone:removePlayerContact', function(phoneNumber, contactName)
+RegisterServerEvent('mrp_phone:removePlayerContact')
+AddEventHandler('mrp_phone:removePlayerContact', function(phoneNumber, contactName)
 	local playerId = source
 	local xPlayer = MRP.getSpawnedCharacter(playerId)
 	local foundNumber = false
@@ -282,7 +302,7 @@ AddEventHandler('esx_phone:removePlayerContact', function(phoneNumber, contactNa
             
             MRP.update('phone', result, {phoneNumber = xPlayer.phoneNumber}, {upsert=true}, function(res)
                 TriggerClientEvent('esx:showNotification', playerId, _U('contact_removed'))
-				TriggerClientEvent('esx_phone:removeContact', playerId, contactName, phoneNumber)
+				TriggerClientEvent('mrp_phone:removeContact', playerId, contactName, phoneNumber)
             end)
 		else
 			TriggerClientEvent('esx:showNotification', playerId, _U('number_not_assigned'))
@@ -290,9 +310,9 @@ AddEventHandler('esx_phone:removePlayerContact', function(phoneNumber, contactNa
 	end)
 end)
 
-RegisterServerEvent('esx_phone:stopDispatch')
-AddEventHandler('esx_phone:stopDispatch', function(dispatchRequestId)
-	TriggerClientEvent('esx_phone:stopDispatch', -1, dispatchRequestId, GetPlayerName(source))
+RegisterServerEvent('mrp_phone:stopDispatch')
+AddEventHandler('mrp_phone:stopDispatch', function(dispatchRequestId)
+	TriggerClientEvent('mrp_phone:stopDispatch', -1, dispatchRequestId, GetPlayerName(source))
 end)
 
 RegisterCommand('pn', function(source, args, rawCommand)
@@ -301,11 +321,11 @@ RegisterCommand('pn', function(source, args, rawCommand)
         return
     end
     
-    TriggerClientEvent('esx_phone:flashNumber', source)
+    TriggerClientEvent('mrp_phone:flashNumber', source)
 end, false)
 
-RegisterServerEvent('esx_phone:broadcastNumber')
-AddEventHandler('esx_phone:broadcastNumber', function(source, target, name, phone)
+RegisterServerEvent('mrp_phone:broadcastNumber')
+AddEventHandler('mrp_phone:broadcastNumber', function(source, target, name, phone)
     TriggerClientEvent('chat:addMessage', target, {
         template = '<div class="chat-message nonemergency">{0} : {1}</div>',
         args = {name, phone}

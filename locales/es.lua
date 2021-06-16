@@ -11,5 +11,6 @@ Locales['es'] = {
   ['number_not_assigned'] = 'el número no ha sido añadido!',
   ['invalid_number'] = 'el número no es válido!',
   ['get_contacts_error'] = 'unable to get contacts!',
+  ['annonymous'] = 'anonymous',
 }
 

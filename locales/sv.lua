@@ -11,4 +11,5 @@ Locales['sv'] = {
   ['number_not_assigned'] = 'det här nummret finns inte!',
   ['invalid_number'] = 'det är inte ett giltigt nummer!',
   ['get_contacts_error'] = 'unable to get contacts!',
+  ['annonymous'] = 'anonymous',
 }

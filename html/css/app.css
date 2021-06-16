@@ -312,7 +312,6 @@ html, body {
     cursor: pointer;
 }
 
-.actions .new-msg.anonyme, .contact .actions .new-msg,
 .actions .new-call.anonyme, .contact .actions .new-call {
     display: none;
 }
