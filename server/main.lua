@@ -294,3 +294,20 @@ RegisterServerEvent('esx_phone:stopDispatch')
 AddEventHandler('esx_phone:stopDispatch', function(dispatchRequestId)
 	TriggerClientEvent('esx_phone:stopDispatch', -1, dispatchRequestId, GetPlayerName(source))
 end)
+
+RegisterCommand('pn', function(source, args, rawCommand)
+    local char = MRP.getSpawnedCharacter(source)
+    if char == nil then
+        return
+    end
+    
+    TriggerClientEvent('esx_phone:flashNumber', source)
+end, false)
+
+RegisterServerEvent('esx_phone:broadcastNumber')
+AddEventHandler('esx_phone:broadcastNumber', function(source, target, name, phone)
+    TriggerClientEvent('chat:addMessage', target, {
+        template = '<div class="chat-message nonemergency">{0} : {1}</div>',
+        args = {name, phone}
+    })
+end)

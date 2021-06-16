@@ -206,6 +206,31 @@ AddEventHandler('esx_phone:setPhoneNumberSource', function(phoneNumber, source)
 	end
 end)
 
+RegisterNetEvent('esx_phone:flashNumber')
+AddEventHandler('esx_phone:flashNumber', function()
+	local char = MRP.GetPlayerData()
+    if char == nil then
+        return
+    end
+    
+    local ped = PlayerPedId()
+    local playerCoords = GetEntityCoords(ped)
+    
+    for key, value in pairs(exports.mrp_core:EnumeratePeds()) do
+        local playerHandle = NetworkGetPlayerIndexFromPed(value)
+        if NetworkIsPlayerActive(playerHandle) then
+            local targetCoords = GetEntityCoords(value)
+            
+            local dist = Vdist(playerCoords.x, playerCoords.y, playerCoords.z, targetCoords.x, targetCoords.y, targetCoords.z)
+            if dist <= Config.FlashNumberArea then
+                local serverId = GetPlayerServerId(playerHandle)
+                
+                TriggerServerEvent('esx_phone:broadcastNumber', GetPlayerServerId(PlayerId()), serverId, char.name .. ' ' .. char.surname, char.phoneNumber);
+            end
+        end
+	end
+end)
+
 RegisterNUICallback('setGPS', function(data)
 	SetNewWaypoint(data.x,  data.y)
 	MRP.Notification(_U('gps_position'), 10000)
@@ -260,15 +285,6 @@ Citizen.CreateThread(function()
 			DisableControlAction(0, 15,   true) -- Weapon Wheel Prev
 			DisableControlAction(0, 16,   true) -- Select Next Weapon
 			DisableControlAction(0, 17,   true) -- Select Prev Weapon
-		else
-			-- open phone
-			-- todo: is player busy (handcuffed, etc)
-			if IsControlJustReleased(0, 288) and IsInputDisabled(0) then
-				if not MRP.UI.Menu.IsOpen('phone', GetCurrentResourceName(), 'main') then
-					MRP.UI.Menu.CloseAll()
-					MRP.UI.Menu.Open('phone', GetCurrentResourceName(), 'main')
-				end
-			end
 		end
 	end
 end)
@@ -276,7 +292,7 @@ end)
 AddEventHandler('onResourceStop', function(resource)
 	if resource == GetCurrentResourceName() then
 		if GUI.PhoneIsShowed then
-			MRP.UI.Menu.CloseAll()
+            ClosePhone()
 		end
 	end
 end)
