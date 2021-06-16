@@ -9,26 +9,14 @@ version '0.0.1'
 server_scripts {
 	'config.lua',
 	'@mrp_core/shared/locale.lua',
-	'locales/de.lua',
-	'locales/br.lua',
-	'locales/en.lua',
-	'locales/fr.lua',
-	'locales/es.lua',
-	'locales/sv.lua',
-	'locales/pl.lua',
+	'locales/*.lua',
 	'server/main.lua'
 }
 
 client_scripts {
 	'@mrp_core/shared/locale.lua',
 	'config.lua',
-	'locales/de.lua',
-	'locales/br.lua',
-	'locales/en.lua',
-	'locales/fr.lua',
-	'locales/es.lua',
-	'locales/sv.lua',
-	'locales/pl.lua',
+	'locales/*.lua',
 	'client/main.lua'
 }
 
@@ -42,18 +30,9 @@ files {
 	'html/scripts/mustache.min.js',
 	'html/scripts/app_en.js',
 
-	'html/img/phone.png',
+	'html/img/*.png',
 
-	'html/img/icons/signal.png',
-	'html/img/icons/rep.png',
-	'html/img/icons/msg.png',
-	'html/img/icons/add.png',
-	'html/img/icons/back.png',
-	'html/img/icons/new-msg.png',
-	'html/img/icons/reply.png',
-	'html/img/icons/write.png',
-	'html/img/icons/edit.png',
-	'html/img/icons/location.png'
+	'html/img/icons/*.png',
 }
 
 dependency 'mrp_core'

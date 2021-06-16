@@ -10,4 +10,5 @@ Locales['en'] = {
   ['contact_removed'] = 'the contact has been removed!',
   ['number_not_assigned'] = 'the number has not been assigned!',
   ['invalid_number'] = 'that\'s not an valid number!',
+  ['get_contacts_error'] = 'unable to get contacts!',
 }

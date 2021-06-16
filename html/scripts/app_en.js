@@ -10,6 +10,7 @@ $(function() {
         '<div class="actions">' +
         '<span class="del-contact" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}">X</span>' +
         '<span class="new-msg newMsg-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span>' +
+        '<span class="new-call newCall-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span>' +
         '</div>' +
         '</div>';
 

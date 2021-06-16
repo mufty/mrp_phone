@@ -150,8 +150,16 @@ AddEventHandler('esx_phone:reload', function(phone_number)
     local playerId = source
     local char = MRP.getSpawnedCharacter(source)
     
+    if phone_number == nil or phone_number == 0 then
+        phone_number = char.phoneNumber
+    end
+    
     MRP.read('phone', {phoneNumber = phone_number}, function(res)
-        TriggerClientEvent('esx_phone:loaded', playerId, phone_number, res.contacts)
+        if res ~= nil then
+            TriggerClientEvent('esx_phone:loaded', playerId, phone_number, res.contacts)
+        else
+            TriggerClientEvent('mrp:showNotification', playerId, _U('get_contacts_error'))
+        end
     end)
 end)
 
