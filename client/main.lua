@@ -4,6 +4,9 @@ GUI.PhoneIsShowed = false
 GUI.MessagesIsShowed = false
 GUI.AddContactIsShowed = false
 MRP = nil
+local isOnCall = false
+local callChannel = -1
+local incCall = false
 
 Citizen.CreateThread(function()
 	while MRP == nil do
@@ -145,10 +148,24 @@ end)
 RegisterNUICallback('start_call', function(data, cb)
 	local phoneNumber = data.phoneNumber
 	local contactName = data.contactName
+    local char = MRP.GetPlayerData()
 
-	--[[if phoneNumber then
-		TriggerServerEvent('mrp_phone:startCall', phoneNumber, contactName)
-	end]]--
+	if phoneNumber then
+        local serverId = GetPlayerServerId(PlayerId())
+        exports['pma-voice']:setCallChannel(serverId)
+        MRP.Notification(_U('call_started'), 10000)
+        callChannel = serverId
+        isOnCall = true
+        ClosePhone()
+		TriggerServerEvent('mrp_phone:startCall', phoneNumber, char.phoneNumber, char.name .. ' ' .. char.surname, serverId)
+	end
+end)
+
+RegisterNetEvent('mrp_phone:incCall')
+AddEventHandler('mrp_phone:incCall', function(fromPhoneNumber, name, call_channel)
+    callChannel = call_channel
+    incCall = true
+    MRP.Notification(_U('call_inc', name, fromPhoneNumber), 10000)
 end)
 
 RegisterNetEvent('mrp_phone:loadTextMessages')
@@ -282,6 +299,19 @@ end)
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
+        
+        if IsControlJustPressed(0, 38) and isOnCall and callChannel ~= -1 then --end call
+            exports['pma-voice']:removePlayerFromCall(callChannel)
+            callChannel = -1
+            isOnCall = false
+            MRP.Notification(_U('call_ended'), 10000)
+        end
+        
+        if incCall and IsControlJustPressed(1, 38) then
+            exports['pma-voice']:setCallChannel(callChannel)
+            isOnCall = true
+            incCall = false
+        end
 
 		if GUI.PhoneIsShowed then -- codes here: https://pastebin.com/guYd0ht4
 			DisableControlAction(0, 1,    true) -- LookLeftRight

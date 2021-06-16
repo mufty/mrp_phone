@@ -171,6 +171,17 @@ AddEventHandler('mrp_phone:reload', function(phone_number)
     end)
 end)
 
+RegisterServerEvent('mrp_phone:startCall')
+AddEventHandler('mrp_phone:startCall', function(phoneNumber, fromPhoneNumber, name, callChannel)
+    if PhoneNumbers[phoneNumber] then
+        for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
+            local numSource = tonumber(k)
+
+            TriggerClientEvent('mrp_phone:incCall', numSource, fromPhoneNumber, name, callChannel)
+        end
+    end
+end)
+
 RegisterServerEvent('mrp_phone:send')
 AddEventHandler('mrp_phone:send', function(phoneNumber, message, anon, position)
 	local xPlayer = MRP.getSpawnedCharacter(source)
