@@ -253,18 +253,16 @@ end)
 RegisterServerEvent('esx_phone:removePlayerContact')
 AddEventHandler('esx_phone:removePlayerContact', function(phoneNumber, contactName)
 	local playerId = source
-	local xPlayer = MRP.GetPlayerFromId(playerId)
+	local xPlayer = MRP.getSpawnedCharacter(playerId)
 	local foundNumber = false
 
-	MySQL.Async.fetchAll('SELECT phone_number FROM users WHERE phone_number = @number', {
-		['@number'] = phoneNumber
-	}, function(result)
-		if result[1] then
+	MRP.read('phone', {phoneNumber = xPlayer.phoneNumber}, function(result)
+		if result ~= nil then
 			foundNumber = true
 		end
 
 		if foundNumber then
-			local contacts = xPlayer.get('contacts')
+			local contacts = result.contacts
 
 			for key, value in pairs(contacts) do
 				if value.name == contactName and value.number == phoneNumber then
@@ -272,16 +270,12 @@ AddEventHandler('esx_phone:removePlayerContact', function(phoneNumber, contactNa
 				end
 			end
 
-			xPlayer.set('contacts', contacts)
-
-			MySQL.Async.execute('DELETE FROM user_contacts WHERE identifier = @identifier AND name = @name AND number = @number', {
-				['@identifier'] = xPlayer.identifier,
-				['@name']       = contactName,
-				['@number']     = phoneNumber
-			}, function(rowsChanged)
-				TriggerClientEvent('esx:showNotification', playerId, _U('contact_removed'))
+            result.contacts = contacts
+            
+            MRP.update('phone', result, {phoneNumber = xPlayer.phoneNumber}, {upsert=true}, function(res)
+                TriggerClientEvent('esx:showNotification', playerId, _U('contact_removed'))
 				TriggerClientEvent('esx_phone:removeContact', playerId, contactName, phoneNumber)
-			end)
+            end)
 		else
 			TriggerClientEvent('esx:showNotification', playerId, _U('number_not_assigned'))
 		end
