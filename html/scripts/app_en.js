@@ -106,8 +106,8 @@ $(function() {
                     sender: contacts[i].label,
                     phoneNumberData: contacts[i].value,
                     senderData: contacts[i].label,
-                    online: contacts[i].online ? 'online' : '',
-                    anonyme: contacts[i].anonyme ? 'online' : ''
+                    online: 'online',
+                    anonyme: 'online'
                 }
 
                 let html = Mustache.render(ContactTpl, view);
@@ -158,7 +158,7 @@ $(function() {
             contacts.push({
                 label: phoneData.contacts[i].name,
                 value: phoneData.contacts[i].number,
-                online: phoneData.contacts[i].online
+                online: true
             })
         }
 
