@@ -52,7 +52,6 @@ function OpenPhone()
         return
     end
     
-	local playerPed = PlayerPedId()
 	TriggerServerEvent('mrp_phone:reload', PhoneData.phoneNumber)
 
 	SendNUIMessage({
@@ -68,8 +67,6 @@ function OpenPhone()
 end
 
 function ClosePhone()
-	local playerPed = PlayerPedId()
-
 	SendNUIMessage({
 		showPhone = false
 	})

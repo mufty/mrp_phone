@@ -4,7 +4,7 @@ local DisptachRequestId, PhoneNumbers = 0, {}
 function fillContactStates(contacts)
     local contactsWithState = {}
     for i, contact in pairs(contacts) do
-        contact.online = PhoneNumbers[phone_number] ~= nil
+        contact.online = PhoneNumbers[contact.number] ~= nil
         contactsWithState[i] = contact
     end
     return contactsWithState
