@@ -1,4 +1,4 @@
-(function() {
+$(function() {
 
     let ContactTpl =
         '<div class="contact {{online}}">' +
@@ -10,6 +10,7 @@
         '<div class="actions">' +
         '<span class="del-contact" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}">X</span>' +
         '<span class="new-msg newMsg-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span>' +
+        '<span class="new-call newCall-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span>' +
         '</div>' +
         '</div>';
 
@@ -21,7 +22,7 @@
         '</div>' +
         '</div>' +
         '<div class="body">{{message}}</div>' +
-        '<div class="actions"><span class="new-msg {{anonyme}} reply-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span><span class="gps {{activeGPS}} gps-btn" data-gpsX="{{gpsLocationX}}" data-gpsY="{{gpsLocationY}}"></span><span class="ok-btn {{showOK}}" data-contact-number="{{okNumberData}}" data-contact-job="{{jobData}}"></span></div>' +
+        '<div class="actions"><span class="new-msg {{anonyme}} reply-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span></div>' +
         '</div>';
 
     let SpecialContactTpl = '<li class="phone-icon" style="background-image: url(\'{{base64Icon}}\');" data-number="{{number}}" data-name="{{name}}">{{name}}</li>';
@@ -85,13 +86,6 @@
         $('#writer .header-title').html('');
     }
 
-    let showGPS = function(xPos, yPos) {
-        $.post('http://mrp_phone/setGPS', JSON.stringify({
-            x: parseFloat(xPos),
-            y: parseFloat(yPos)
-        }));
-    }
-
     let renderContacts = function() {
 
         let contactHTML = '';
@@ -106,7 +100,7 @@
                     phoneNumberData: contacts[i].value,
                     senderData: contacts[i].label,
                     online: contacts[i].online ? 'online' : '',
-                    anonyme: contacts[i].anonyme ? 'online' : ''
+                    anonyme: 'online'
                 }
 
                 let html = Mustache.render(ContactTpl, view);
@@ -115,7 +109,7 @@
             }
 
         } else {
-            contactHTML = '<div class="contact no-item online"><p class="no-item">Brak Kontaktów</p></div>';
+            contactHTML = '<div class="contact no-item online"><p class="no-item">No contacts</p></div>';
         }
 
         $('#phone #repertoire .repertoire-list').html(contactHTML);
@@ -130,13 +124,22 @@
             }))
         });
 
-        $('.contact.online .new-msg').click(function() {
+        $('.contact .new-msg').click(function() {
             showNewMessage($(this).attr('data-contact-number'), $(this).attr('data-contact-name'));
         });
 
+        $('.contact .new-call').click(function() {
+            let name = $(this).attr('data-contact-name');
+            let phoneNumber = $(this).attr('data-contact-number');
+
+            $.post('http://mrp_phone/start_call', JSON.stringify({
+                contactName: name,
+                phoneNumber: phoneNumber
+            }))
+        });
     }
 
-    $('.contact.online .new-msg').click(function() {
+    $('.contact .new-msg').click(function() {
         showNewMessage($(this).attr('data-contact-number'));
     });
 
@@ -186,19 +189,13 @@
         if (messages.length > 0) {
 
             for (let i = 0; i < messages.length; i++) {
-
                 let fromName = "Unknown";
                 let fromNumber = messages[i].value;
                 let anonyme = null;
 
-                if (messages[i].job != "player")
-                    fromName = messages[i].job;
-
                 if (messages[i].anonyme) {
 
-                    if (messages[i].job == "player")
-                        fromName = "Anonymous";
-
+                    fromName = "Anonymous";
                     fromNumber = "Anonymous";
                     anonyme = 'anonyme';
 
@@ -206,8 +203,7 @@
 
                     for (let j = 0; j < contacts.length; j++)
                         if (contacts[j].value == messages[i].value)
-                            if (messages[i].job == "player")
-                                fromName = contacts[j].label;
+                            fromName = contacts[j].label;
 
                     anonyme = '';
                 }
@@ -218,13 +214,7 @@
                     sender: fromName,
                     message: messages[i].message,
                     phoneNumberData: fromNumber,
-                    senderData: fromName,
-                    okNumberData: fromNumber,
-                    gpsLocationX: (messages[i].job == 'player') ? '' : messages[i].position.x,
-                    gpsLocationY: (messages[i].job == 'player') ? '' : messages[i].position.y,
-                    activeGPS: (messages[i].job == 'player') ? '' : (messages[i].position) ? 'active' : '',
-                    jobData: (messages[i].job == 'player') ? '' : messages[i].job,
-                    showOK: (messages[i].job == 'player') ? '' : 'showOK'
+                    senderData: fromName
                 }
 
                 let html = Mustache.render(MessageTpl, view);
@@ -232,25 +222,13 @@
                 messageHTML = html + messageHTML;
             }
         } else {
-            messageHTML = '<div class="message no-item"><p class="no-item">Brak wiadomości</p></div>';
+            messageHTML = '<div class="message no-item"><p class="no-item">No messages</p></div>';
         }
 
         $('#phone #messages .messages-list').html(messageHTML);
 
         $('.message .new-msg').click(function() {
             showNewMessage($(this).attr('data-contact-number'), $(this).attr('data-contact-name'));
-        });
-
-        $('.message .gps').click(function() {
-            showGPS($(this).attr('data-gpsX'), $(this).attr('data-gpsY'));
-        });
-
-        $('.message .ok-btn').click(function() {
-            $.post('http://mrp_phone/send', JSON.stringify({
-                message: $(this).attr('data-contact-job') + ": Otrzymane!",
-                number: $(this).attr('data-contact-number'),
-                anonyme: false
-            }))
         });
     }
 
@@ -309,8 +287,8 @@
         $('.phone-icon').unbind('click');
 
         $('#phone .menu .home').html(
-            '<li class="phone-icon" id="phone-icon-rep">Kontakty</li>' +
-            '<li class="phone-icon" id="phone-icon-msg">Wiadomości</li>'
+            '<li class="phone-icon" id="phone-icon-rep">Contacts</li>' +
+            '<li class="phone-icon" id="phone-icon-msg">Messages</li>'
         );
 
         for (let i = 0; i < specialContacts.length; i++) {
@@ -393,7 +371,7 @@
     });
 
     $('#btn-head-new-message').click(function() {
-        showNewMessage('', 'Nowa wiadomosc');
+        showNewMessage('', 'New message');
     });
 
     $('#btn-head-new-contact').click(function() {
@@ -456,6 +434,14 @@
             addMessage(data.phoneNumber, data.message, data.position, data.anonyme, data.job);
         }
 
+        if (data.fillMessages === true) {
+            if (data.messages && data.messages.length > 0) {
+                for (let message of data.messages) {
+                    addMessage(message.from, message.message, null, message.from == "anonymous", null);
+                }
+            }
+        }
+
         if (data.contactAdded === true) {
             reloadPhone(data.phoneData);
             hideAddContact();
@@ -511,4 +497,4 @@
         }
     });
 
-})();
+});

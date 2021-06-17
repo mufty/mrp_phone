@@ -22,7 +22,7 @@ $(function() {
         '</div>' +
         '</div>' +
         '<div class="body">{{message}}</div>' +
-        '<div class="actions"><span class="new-msg {{anonyme}} reply-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span><span class="gps gps-btn"></span></div>' +
+        '<div class="actions"><span class="new-msg {{anonyme}} reply-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span></div>' +
         '</div>';
 
     let SpecialContactTpl = '<li class="phone-icon" style="background-image: url(\'{{base64Icon}}\');" data-number="{{number}}" data-name="{{name}}">{{name}}</li>';
@@ -86,13 +86,6 @@ $(function() {
         $('#writer .header-title').html('');
     }
 
-    let showGPS = function(xPos, yPos) {
-        $.post('http://mrp_phone/setGPS', JSON.stringify({
-            x: parseFloat(xPos),
-            y: parseFloat(yPos)
-        }));
-    }
-
     let renderContacts = function() {
 
         let contactHTML = '';
@@ -106,7 +99,7 @@ $(function() {
                     sender: contacts[i].label,
                     phoneNumberData: contacts[i].value,
                     senderData: contacts[i].label,
-                    online: 'online',
+                    online: contacts[i].online ? 'online' : '',
                     anonyme: 'online'
                 }
 
@@ -158,7 +151,7 @@ $(function() {
             contacts.push({
                 label: phoneData.contacts[i].name,
                 value: phoneData.contacts[i].number,
-                online: true
+                online: phoneData.contacts[i].online
             })
         }
 
@@ -236,10 +229,6 @@ $(function() {
 
         $('.message .new-msg').click(function() {
             showNewMessage($(this).attr('data-contact-number'), $(this).attr('data-contact-name'));
-        });
-
-        $('.message .gps').click(function() {
-            showGPS($(this).attr('data-gpsX'), $(this).attr('data-gpsY'));
         });
     }
 

@@ -11,8 +11,6 @@ function fillContactStates(contacts)
 end
 
 function UsePhoneNumber(phone_number, source, char)
-    TriggerClientEvent('mrp_phone:setPhoneNumberSource', -1, phone_number, source)
-
 	PhoneNumbers[phone_number] = {
 		sources       = {[source] = true}
 	}
@@ -32,12 +30,6 @@ function LoadPlayer(source, char)
     if char == nil then
         char = MRP.getSpawnedCharacter(source)
     end
-
-	for num,v in pairs(PhoneNumbers) do
-		for src,_ in pairs(v.sources) do
-			TriggerClientEvent('mrp_phone:setPhoneNumberSource', source, num, tonumber(src))
-		end
-	end
 
 	local phone_number = char.phoneNumber
 
@@ -127,8 +119,6 @@ AddEventHandler('playerDropped', function(reason)
 	local char = MRP.getSpawnedCharacter(source)
 	local phoneNumber = char.phoneNumber
 
-    --TODO don't need mrp_phone:setPhoneNumberSource we have contacts for that
-	TriggerClientEvent('mrp_phone:setPhoneNumberSource', -1, phoneNumber, -1)
 	PhoneNumbers[phoneNumber] = nil
 end)
 

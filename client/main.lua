@@ -1,4 +1,4 @@
-local GUI, PhoneData, PhoneNumberSources = {}, {phoneNumber = 0, contacts = {}}, {}
+local GUI, PhoneData = {}, {phoneNumber = 0, contacts = {}}
 GUI.PhoneIsShowed = false
 GUI.MessagesIsShowed = false
 GUI.AddContactIsShowed = false
@@ -83,7 +83,6 @@ AddEventHandler('mrp_phone:loaded', function(phoneNumber, contacts)
 	PhoneData.contacts = {}
 
 	for i=1, #contacts, 1 do
-		contacts[i].online = (PhoneNumberSources[contacts[i].number] == nil and false or NetworkIsPlayerActive(GetPlayerFromServerId(PhoneNumberSources[contacts[i].number]))),
 		table.insert(PhoneData.contacts, contacts[i])
 	end
 
@@ -119,24 +118,6 @@ AddEventHandler('mrp_phone:removeContact', function(name, phoneNumber)
 	SendNUIMessage({
 		contactRemoved = true,
 		phoneData      = PhoneData
-	})
-end)
-
-RegisterNetEvent('mrp_phone:addSpecialContact')
-AddEventHandler('mrp_phone:addSpecialContact', function(name, phoneNumber, base64Icon)
-	SendNUIMessage({
-		addSpecialContact = true,
-		name              = name,
-		number            = phoneNumber,
-		base64Icon        = base64Icon
-	})
-end)
-
-RegisterNetEvent('mrp_phone:removeSpecialContact')
-AddEventHandler('mrp_phone:removeSpecialContact', function(phoneNumber)
-	SendNUIMessage({
-		removeSpecialContact = true,
-		number               = phoneNumber
 	})
 end)
 
@@ -216,15 +197,6 @@ AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, anon)
 	})
 end)
 
-RegisterNetEvent('mrp_phone:setPhoneNumberSource')
-AddEventHandler('mrp_phone:setPhoneNumberSource', function(phoneNumber, source)
-	if source == -1 then
-		PhoneNumberSources[phoneNumber] = nil
-	else
-		PhoneNumberSources[phoneNumber] = source
-	end
-end)
-
 RegisterNetEvent('mrp_phone:flashNumber')
 AddEventHandler('mrp_phone:flashNumber', function()
 	local char = MRP.GetPlayerData()
@@ -248,11 +220,6 @@ AddEventHandler('mrp_phone:flashNumber', function()
             end
         end
 	end
-end)
-
-RegisterNUICallback('setGPS', function(data)
-	SetNewWaypoint(data.x,  data.y)
-	MRP.Notification(_U('gps_position'), 10000)
 end)
 
 RegisterNUICallback('send', function(data)
