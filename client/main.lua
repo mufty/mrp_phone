@@ -32,9 +32,13 @@ RegisterCommand('triggerCall', function()
         callChannel = -1
         isOnCall = false
         MRP.Notification(_U('call_ended'), 10000)
+        PhonePlayText()
+        TriggerServerEvent('mrp_phone:endCall', callChannel)
     end
     
     if incCall then
+        TriggerServerEvent('mrp_phone:pickupCall', PhoneData.phoneNumber, callChannel)
+        PhonePlayCall()
         exports['pma-voice']:setCallChannel(callChannel)
         isOnCall = true
         incCall = false
@@ -60,9 +64,7 @@ function OpenPhone()
 
 	SetNuiFocus(true, true)
 
-	if not IsPedInAnyVehicle(playerPed, false) then
-		TaskStartScenarioInPlace(playerPed, 'WORLD_HUMAN_STAND_MOBILE', 0, true)
-	end
+    PhonePlayIn()
 end
 
 function ClosePhone()
@@ -74,7 +76,7 @@ function ClosePhone()
 
 	SetNuiFocus(false)
 	GUI.PhoneIsShowed = false
-	ClearPedTasks(playerPed)
+	PhonePlayOut()
 end
 
 RegisterNetEvent('mrp_phone:loaded')
@@ -90,6 +92,17 @@ AddEventHandler('mrp_phone:loaded', function(phoneNumber, contacts)
 		reloadPhone = true,
 		phoneData   = PhoneData
 	})
+end)
+
+RegisterNetEvent('mrp_phone:callEnded')
+AddEventHandler('mrp_phone:callEnded', function(call_channel)
+    if callChannel ~= -1 then
+        exports['pma-voice']:removePlayerFromCall(call_channel)
+        callChannel = -1
+        isOnCall = false
+        MRP.Notification(_U('call_ended'), 10000)
+        PhonePlayText()
+    end
 end)
 
 RegisterNetEvent('mrp_phone:addContact')
@@ -153,6 +166,7 @@ RegisterNUICallback('start_call', function(data, cb)
         callChannel = serverId
         isOnCall = true
         ClosePhone()
+        PhonePlayCall()
 		TriggerServerEvent('mrp_phone:startCall', phoneNumber, char.phoneNumber, char.name .. ' ' .. char.surname, serverId)
 	end
 end)

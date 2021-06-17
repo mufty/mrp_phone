@@ -150,8 +150,35 @@ AddEventHandler('mrp_phone:startCall', function(phoneNumber, fromPhoneNumber, na
     if PhoneNumbers[phoneNumber] then
         for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
             local numSource = tonumber(k)
+            
+            PhoneNumbers[fromPhoneNumber].activeCallChannel = callChannel
 
             TriggerClientEvent('mrp_phone:incCall', numSource, fromPhoneNumber, name, callChannel)
+        end
+    end
+end)
+
+RegisterServerEvent('mrp_phone:pickupCall')
+AddEventHandler('mrp_phone:pickupCall', function(callChannel)
+    local xPlayer = MRP.getSpawnedCharacter(source)
+    if PhoneNumbers[xPlayer.phoneNumber] then
+        PhoneNumbers[xPlayer.phoneNumber].activeCallChannel = callChannel
+    end
+end)
+
+RegisterServerEvent('mrp_phone:endCall')
+AddEventHandler('mrp_phone:endCall', function(callChannel)
+    local xPlayer = MRP.getSpawnedCharacter(playerId)
+    if PhoneNumbers[xPlayer.phoneNumber] then
+        for k,v in pairs(PhoneNumbers) do
+            if v.activeCallChannel ~= nil and v.activeCallChannel == callChannel then
+                v.activeCallChannel = nil
+                
+                for i,s in pairs(v.sources) do
+                    local numSource = tonumber(s)
+                    TriggerClientEvent('mrp_phone:callEnded', numSource, callChannel)
+                end
+            end
         end
     end
 end)

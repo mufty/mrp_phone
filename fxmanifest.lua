@@ -10,14 +10,14 @@ server_scripts {
 	'config.lua',
 	'@mrp_core/shared/locale.lua',
 	'locales/*.lua',
-	'server/main.lua'
+	'server/*.lua'
 }
 
 client_scripts {
 	'@mrp_core/shared/locale.lua',
 	'config.lua',
 	'locales/*.lua',
-	'client/main.lua'
+	'client/*.lua'
 }
 
 ui_page 'html/ui_en.html'
