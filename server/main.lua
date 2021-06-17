@@ -152,6 +152,8 @@ AddEventHandler('mrp_phone:startCall', function(phoneNumber, fromPhoneNumber, na
             local numSource = tonumber(k)
             
             PhoneNumbers[fromPhoneNumber].activeCallChannel = callChannel
+            print(PhoneNumbers[fromPhoneNumber].online)
+            print(PhoneNumbers[fromPhoneNumber].activeCallChannel)
 
             TriggerClientEvent('mrp_phone:incCall', numSource, fromPhoneNumber, name, callChannel)
         end
@@ -168,6 +170,10 @@ end)
 
 RegisterServerEvent('mrp_phone:endCall')
 AddEventHandler('mrp_phone:endCall', function(callChannel)
+    print('------------------')
+    print('ending call')
+    print(callChannel)
+    print('------------------')
     local xPlayer = MRP.getSpawnedCharacter(source)
     if PhoneNumbers[xPlayer.phoneNumber] then
         for k,v in pairs(PhoneNumbers) do
@@ -175,7 +181,13 @@ AddEventHandler('mrp_phone:endCall', function(callChannel)
                 v.activeCallChannel = nil
                 
                 for i,s in pairs(v.sources) do
-                    local numSource = tonumber(s)
+                    local numSource = tonumber(i)
+                    print('------------------')
+                    print('sending mrp_phone:callEnded to')
+                    print(numSource)
+                    print('for channel')
+                    print(callChannel)
+                    print('------------------')
                     TriggerClientEvent('mrp_phone:callEnded', numSource, callChannel)
                 end
             end

@@ -32,6 +32,11 @@ RegisterCommand('triggerCall', function()
         callChannel = -1
         isOnCall = false
         MRP.Notification(_U('call_ended'), 10000)
+        print('------------------')
+        print('hangup call')
+        print(PhoneData.phoneNumber)
+        print(callChannel)
+        print('------------------')
         TriggerServerEvent('mrp_phone:endCall', callChannel)
         PhonePlayText()
         Citizen.Wait(500)
@@ -39,6 +44,11 @@ RegisterCommand('triggerCall', function()
     end
     
     if incCall then
+        print('------------------')
+        print('client pickup call')
+        print(PhoneData.phoneNumber)
+        print(callChannel)
+        print('------------------')
         TriggerServerEvent('mrp_phone:pickupCall', PhoneData.phoneNumber, callChannel)
         PhonePlayCall()
         exports['pma-voice']:setCallChannel(callChannel)
