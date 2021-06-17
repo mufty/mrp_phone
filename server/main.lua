@@ -168,7 +168,7 @@ end)
 
 RegisterServerEvent('mrp_phone:endCall')
 AddEventHandler('mrp_phone:endCall', function(callChannel)
-    local xPlayer = MRP.getSpawnedCharacter(playerId)
+    local xPlayer = MRP.getSpawnedCharacter(source)
     if PhoneNumbers[xPlayer.phoneNumber] then
         for k,v in pairs(PhoneNumbers) do
             if v.activeCallChannel ~= nil and v.activeCallChannel == callChannel then
