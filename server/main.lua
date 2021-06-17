@@ -127,6 +127,7 @@ AddEventHandler('playerDropped', function(reason)
 	local char = MRP.getSpawnedCharacter(source)
 	local phoneNumber = char.phoneNumber
 
+    --TODO don't need mrp_phone:setPhoneNumberSource we have contacts for that
 	TriggerClientEvent('mrp_phone:setPhoneNumberSource', -1, phoneNumber, -1)
 	PhoneNumbers[phoneNumber] = nil
 end)
@@ -193,11 +194,7 @@ AddEventHandler('mrp_phone:send', function(phoneNumber, message, anon, position)
                 for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
         			local numSource        = tonumber(k)
         
-        			if numHasDispatch then
-        				TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, anon, numType, GetDistpatchRequestId(), phoneNumber)
-        			else
-        				TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, anon, numType, false)
-        			end
+        			TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, anon)
         		end
             end
         end)
@@ -240,7 +237,7 @@ AddEventHandler('mrp_phone:addPlayerContact', function(phone_number, contactName
                 
                 MRP.update('phone', {phoneNumber = xPlayer.phoneNumber, contacts = contacts}, {phoneNumber = xPlayer.phoneNumber}, {upsert=true}, function(res)
                     TriggerClientEvent('esx:showNotification', playerId, _U('contact_added'))
-					TriggerClientEvent('mrp_phone:addContact', playerId, contactName, phone_number, true)
+					TriggerClientEvent('mrp_phone:addContact', playerId, contactName, phone_number, PhoneNumbers[phone_number] ~= nil)
                 end)
 			end
 		else
@@ -279,11 +276,6 @@ AddEventHandler('mrp_phone:removePlayerContact', function(phoneNumber, contactNa
 			TriggerClientEvent('esx:showNotification', playerId, _U('number_not_assigned'))
 		end
 	end)
-end)
-
-RegisterServerEvent('mrp_phone:stopDispatch')
-AddEventHandler('mrp_phone:stopDispatch', function(dispatchRequestId)
-	TriggerClientEvent('mrp_phone:stopDispatch', -1, dispatchRequestId, GetPlayerName(source))
 end)
 
 RegisterCommand('pn', function(source, args, rawCommand)

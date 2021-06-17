@@ -1,5 +1,4 @@
-local GUI, PhoneData, CurrentActionData, PhoneNumberSources, CurrentDispatchRequestId = {}, {phoneNumber = 0, contacts = {}}, {}, {}, -1
-local CurrentAction, CurrentActionMsg
+local GUI, PhoneData, PhoneNumberSources = {}, {phoneNumber = 0, contacts = {}}, {}
 GUI.PhoneIsShowed = false
 GUI.MessagesIsShowed = false
 GUI.AddContactIsShowed = false
@@ -193,20 +192,19 @@ AddEventHandler('mrp_phone:loadTextMessages', function(messages)
 end)
 
 RegisterNetEvent('mrp_phone:onMessage')
-AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, position, anon, job, dispatchRequestId, dispatchNumber)
-	if dispatchNumber and phoneNumber == PhoneData.phoneNumber then
-		TriggerEvent('mrp_phone:cancelMessage', dispatchNumber)
+AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, anon)
+    local msgFrom = anon and _U('annonymous') or phoneNumber
+    
+    --find name from contact list
+    if not anon then
+        for k, v in pairs(PhoneData.contacts) do
+            if v.number == phoneNumber then
+                msgFrom = v.name
+            end
+        end
+    end
 
-		if WasEventCanceled() then
-			return
-		end
-	end
-
-	if job == 'player' then
-        MRP.Notification(_U('invalid_number', message), 10000)
-	else
-        MRP.Notification(('~b~%s:~s~ %s'):format(job, message), 10000)
-	end
+    MRP.Notification(('~b~%s:~s~ %s'):format(msgFrom, message), 10000)
 
 	PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
 
@@ -214,37 +212,8 @@ AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, position, 
 		newMessage  = true,
 		phoneNumber = phoneNumber,
 		message     = message,
-		position    = position,
-		anonyme     = anon,
-		job         = job
+		anonyme     = anon
 	})
-
-	if dispatchRequestId then
-		CurrentAction            = 'dispatch'
-		CurrentActionMsg         = _U('press_take_call', job)
-		CurrentDispatchRequestId = dispatchRequestId
-
-		CurrentActionData = {
-			phoneNumber = phoneNumber,
-			message     = message,
-			position    = position,
-			actions     = actions,
-			anonyme     = anon,
-			job         = job
-		}
-
-		MRP.SetTimeout(15000, function()
-			CurrentAction = nil
-		end)
-	end
-end)
-
-RegisterNetEvent('mrp_phone:stopDispatch')
-AddEventHandler('mrp_phone:stopDispatch', function(dispatchRequestId, playerName)
-	if CurrentDispatchRequestId == dispatchRequestId and CurrentAction == 'dispatch' then
-		CurrentAction = nil
-		MRP.Notification(_U('taken_call', playerName), 10000)
-	end
 end)
 
 RegisterNetEvent('mrp_phone:setPhoneNumberSource')
@@ -343,28 +312,6 @@ AddEventHandler('onResourceStop', function(resource)
 	if resource == GetCurrentResourceName() then
 		if GUI.PhoneIsShowed then
             ClosePhone()
-		end
-	end
-end)
-
--- Key controls
-Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(0)
-
-		if CurrentAction then
-			MRP.ShowHelpNotification(CurrentActionMsg)
-
-			if IsControlJustReleased(0, 38) and IsInputDisabled(0) then
-				if CurrentAction == 'dispatch' then
-					TriggerServerEvent('mrp_phone:stopDispatch', CurrentDispatchRequestId)
-					SetNewWaypoint(CurrentActionData.position.x, CurrentActionData.position.y)
-				end
-
-				CurrentAction = nil
-			end
-		else
-			Citizen.Wait(500)
 		end
 	end
 end)
