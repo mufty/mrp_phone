@@ -1,15 +1,19 @@
 MRP = nil
 local DisptachRequestId, PhoneNumbers = 0, {}
 
+function fillContactStates(contacts)
+    local contactsWithState = {}
+    for i, contact in pairs(contacts) do
+        contact.online = PhoneNumbers[phone_number] ~= nil
+        contactsWithState[i] = contact
+    end
+    return contactsWithState
+end
+
 function UsePhoneNumber(phone_number, source, char)
     TriggerClientEvent('mrp_phone:setPhoneNumberSource', -1, phone_number, source)
 
 	PhoneNumbers[phone_number] = {
-		type          = 'player',
-		hashDispatch  = false,
-		sharePos      = false,
-		hideNumber    = false,
-		hidePosIfAnon = false,
 		sources       = {[source] = true}
 	}
 
@@ -19,7 +23,8 @@ function UsePhoneNumber(phone_number, source, char)
     
     MRP.read('phone', {phoneNumber = phone_number}, function(res)
     	TriggerEvent('mrp_phone:addSource', phone_number, source)
-        TriggerClientEvent('mrp_phone:loaded', source, phone_number, res.contacts)
+        local contacts = fillContactStates(res.contacts)
+        TriggerClientEvent('mrp_phone:loaded', source, phone_number, contacts)
     end)
 end
 
@@ -29,10 +34,8 @@ function LoadPlayer(source, char)
     end
 
 	for num,v in pairs(PhoneNumbers) do
-		if tonumber(num) == num then -- if phonenumber is a player phone number
-			for src,_ in pairs(v.sources) do
-				TriggerClientEvent('mrp_phone:setPhoneNumberSource', source, num, tonumber(src))
-			end
+		for src,_ in pairs(v.sources) do
+			TriggerClientEvent('mrp_phone:setPhoneNumberSource', source, num, tonumber(src))
 		end
 	end
 
@@ -139,7 +142,8 @@ AddEventHandler('mrp_phone:reload', function(phone_number)
     
     MRP.read('phone', {phoneNumber = phone_number}, function(res)
         if res ~= nil then
-            TriggerClientEvent('mrp_phone:loaded', playerId, phone_number, res.contacts)
+            local contacts = fillContactStates(res.contacts)
+            TriggerClientEvent('mrp_phone:loaded', playerId, phone_number, contacts)
         else
             TriggerClientEvent('mrp:showNotification', playerId, _U('get_contacts_error'))
         end
@@ -187,40 +191,17 @@ AddEventHandler('mrp_phone:send', function(phoneNumber, message, anon, position)
         MRP.create('phone_message', msgObj, function(res)
             if PhoneNumbers[phoneNumber] then
                 for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
-        			local numType          = PhoneNumbers[phoneNumber].type
-        			local numHasDispatch   = PhoneNumbers[phoneNumber].hasDispatch
-        			local numHide          = PhoneNumbers[phoneNumber].hideNumber
-        			local numHidePosIfAnon = PhoneNumbers[phoneNumber].hidePosIfAnon
-        			local numPosition      = (PhoneNumbers[phoneNumber].sharePos and position or false)
         			local numSource        = tonumber(k)
         
-        			if numHidePosIfAnon and anon then
-        				numPosition = false
-        			end
-        
         			if numHasDispatch then
-        				TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, (numHide and true or anon), numType, GetDistpatchRequestId(), phoneNumber)
+        				TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, anon, numType, GetDistpatchRequestId(), phoneNumber)
         			else
-        				TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, (numHide and true or anon), numType, false)
+        				TriggerClientEvent('mrp_phone:onMessage', numSource, xPlayer.phoneNumber, message, numPosition, anon, numType, false)
         			end
         		end
             end
         end)
     end)
-end)
-
-AddEventHandler('mrp_phone:registerNumber', function(number, type, sharePos, hasDispatch, hideNumber, hidePosIfAnon)
-	local hideNumber    = hideNumber    or false
-	local hidePosIfAnon = hidePosIfAnon or false
-
-	PhoneNumbers[number] = {
-		type          = type,
-		sharePos      = sharePos,
-		hasDispatch   = (hasDispatch or false),
-		hideNumber    = hideNumber,
-		hidePosIfAnon = hidePosIfAnon,
-		sources       = {}
-	}
 end)
 
 AddEventHandler('mrp_phone:addSource', function(number, source)
