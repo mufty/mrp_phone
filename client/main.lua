@@ -24,7 +24,7 @@ RegisterCommand('togglePhone', function()
         ClosePhone()
     end
 end, false)
-RegisterKeyMapping('togglePhone', 'Open phone', 'keyboard', 'UP')
+RegisterKeyMapping('togglePhone', 'Open phone', 'keyboard', 'b')
 
 RegisterCommand('triggerCall', function()
     if isOnCall and callChannel ~= -1 then --end call
@@ -32,8 +32,10 @@ RegisterCommand('triggerCall', function()
         callChannel = -1
         isOnCall = false
         MRP.Notification(_U('call_ended'), 10000)
-        PhonePlayText()
         TriggerServerEvent('mrp_phone:endCall', callChannel)
+        PhonePlayText()
+        Citizen.Wait(500)
+        PhonePlayOut()
     end
     
     if incCall then
