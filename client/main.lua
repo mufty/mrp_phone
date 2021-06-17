@@ -41,7 +41,7 @@ RegisterCommand('triggerCall', function()
         incCall = false
     end
 end, false)
-RegisterKeyMapping('triggerCall', 'trigger call', 'keyboard', 'E')
+RegisterKeyMapping('triggerCall', 'Answer/Hangup call', 'keyboard', 'E')
 
 function OpenPhone()
     local char = MRP.GetPlayerData()
@@ -315,19 +315,6 @@ end)
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
-        
-        --[[if IsControlJustPressed(0, 38) and isOnCall and callChannel ~= -1 then --end call
-            exports['pma-voice']:removePlayerFromCall(callChannel)
-            callChannel = -1
-            isOnCall = false
-            MRP.Notification(_U('call_ended'), 10000)
-        end
-        
-        if incCall and IsControlJustPressed(1, 38) then
-            exports['pma-voice']:setCallChannel(callChannel)
-            isOnCall = true
-            incCall = false
-        end]]--
 
 		if GUI.PhoneIsShowed then -- codes here: https://pastebin.com/guYd0ht4
 			DisableControlAction(0, 1,    true) -- LookLeftRight
