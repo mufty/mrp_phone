@@ -18,15 +18,8 @@ function UsePhoneNumber(phone_number, source, char)
     TriggerClientEvent('mrp:updateCharacter', source, char)
     
     MRP.read('phone', {phoneNumber = phone_number}, function(res)
-        if PhoneNumbers[char.job.name] then
-    		TriggerEvent('mrp_phone:addSource', char.job.name, source)
-    	end
-        
+    	TriggerEvent('mrp_phone:addSource', phone_number, source)
         TriggerClientEvent('mrp_phone:loaded', source, phone_number, res.contacts)
-        
-        --[[MRP.find('phone_message', {phoneNumber = phone_number}, {sort = 'date'}, {skip = false, limit = false}, function(res)
-            TriggerClientEvent('mrp_phone:loadTextMessages', source, res)
-        end)]]--
     end)
 end
 
@@ -133,20 +126,6 @@ AddEventHandler('playerDropped', function(reason)
 
 	TriggerClientEvent('mrp_phone:setPhoneNumberSource', -1, phoneNumber, -1)
 	PhoneNumbers[phoneNumber] = nil
-
-	if PhoneNumbers[char.job.name] then
-		TriggerEvent('mrp_phone:removeSource', char.job.name, source)
-	end
-end)
-
-AddEventHandler('esx:setJob', function(source, job, lastJob)
-	if PhoneNumbers[lastJob.name] then
-		TriggerEvent('mrp_phone:removeSource', lastJob.name, source)
-	end
-
-	if PhoneNumbers[job.name] then
-		TriggerEvent('mrp_phone:addSource', job.name, source)
-	end
 end)
 
 RegisterServerEvent('mrp_phone:reload')
@@ -244,16 +223,8 @@ AddEventHandler('mrp_phone:registerNumber', function(number, type, sharePos, has
 	}
 end)
 
-AddEventHandler('mrp_phone:removeNumber', function(number)
-	PhoneNumbers[number] = nil
-end)
-
 AddEventHandler('mrp_phone:addSource', function(number, source)
 	PhoneNumbers[number].sources[tostring(source)] = true
-end)
-
-AddEventHandler('mrp_phone:removeSource', function(number, source)
-	PhoneNumbers[number].sources[tostring(source)] = nil
 end)
 
 RegisterServerEvent('mrp_phone:addPlayerContact')
