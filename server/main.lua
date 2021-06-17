@@ -228,16 +228,16 @@ AddEventHandler('mrp_phone:addPlayerContact', function(phone_number, contactName
 	local xPlayer = MRP.getSpawnedCharacter(playerId)
 
 	if phone_number == nil then
-		print(('mrp_phone: %s parsed invalid player contact number!'):format(xPlayer.surname))
+		print(('mrp_phone: %s parsed invalid player contact number!'):format(contactName))
 		return
 	end
 
-    MRP.read('phone', {phoneNumber = phone_number}, function(result)
+    MRP.read('phone', {phoneNumber = xPlayer.phoneNumber}, function(result)
 		if result ~= nil then
 			if phone_number == xPlayer.phoneNumber then
 				TriggerClientEvent('mrp:showNotification', playerId, _U('cannot_add_self'))
 			else
-				local contacts  = result.contacts
+				local contacts = result.contacts
 
 				-- already added player?
 				for i=1, #contacts, 1 do
