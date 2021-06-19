@@ -145,11 +145,11 @@ $(function() {
     }
 
     let showRepertoire = function() {
-        $('#repertoire').addClass('active');
+        $('#contacts').addClass('active');
     }
 
     let hideRepertoire = function() {
-        $('#repertoire').removeClass('active');
+        $('#contacts').removeClass('active');
     }
 
     let showAddContact = function() {
@@ -190,7 +190,7 @@ $(function() {
             contactHTML = '<div class="contact no-item online"><p class="no-item">No contacts</p></div>';
         }
 
-        $('#phone #repertoire .repertoire-list').html(contactHTML);
+        $('#phone #contacts .contacts-list').html(contactHTML);
 
         $('.contact .del-contact').click(function() {
             let name = $(this).attr('data-contact-name');
