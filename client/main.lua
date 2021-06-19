@@ -98,6 +98,7 @@ AddEventHandler('mrp_phone:loaded', function(phoneNumber, contacts)
 	end
 
 	SendNUIMessage({
+        app         = 'global',
 		reloadPhone = true,
 		phoneData   = PhoneData
 	})
@@ -190,6 +191,7 @@ end)
 RegisterNetEvent('mrp_phone:loadTextMessages')
 AddEventHandler('mrp_phone:loadTextMessages', function(messages)
     SendNUIMessage({
+        app = "message",
 		fillMessages  = true,
 		messages = messages,
 	})
@@ -213,6 +215,7 @@ AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, anon)
 	PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
 
 	SendNUIMessage({
+        app         = "message",
 		newMessage  = true,
 		phoneNumber = phoneNumber,
 		message     = message,
@@ -261,6 +264,7 @@ RegisterNUICallback('send', function(data)
 	})
 
 	SendNUIMessage({
+        app = "message",
 		showMessageEditor = false
 	})
 

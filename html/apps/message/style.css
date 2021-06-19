@@ -1,0 +1,30 @@
+#phone-icon-msg {
+    background-image: url("../../img/icons/msg.png");
+}
+
+.message, .contact {
+    position: relative;
+    padding: 3px 35px 3px 25px;
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    color: #212121;
+    min-height: 30px;
+}
+
+.message.no-item, .contact.no-item {
+    padding: 3px 5px;
+}
+
+.message .sender-info, .message .body, .contact .sender-info {
+    margin-right: 30px;
+}
+
+.message .phone-number {
+    line-height: 10px;
+    color: #999;
+}
+
+.message .body {
+    margin-top: 5px;
+    line-height: 16px;
+}

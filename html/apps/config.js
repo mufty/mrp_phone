@@ -4,7 +4,8 @@ Config = {
             menuId: 'phone-icon-msg',
             template: 'message/templates/screen.html',
             extraTemplates: ['message/templates/message.html'],
-            scripts: ['message/scripts/app.js'],
+            scripts: ['message/scripts/message.js'],
+            style: 'message/style.css',
             locale: 'message/locale.js'
         }
     },
@@ -13,6 +14,8 @@ Config = {
 
 Locale = {
     en: {
-        "message": "Messages"
+        message: "Messages",
+        cancel: "Cancel",
+        annonymous: "Annonymous"
     }
 };

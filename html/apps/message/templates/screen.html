@@ -1,12 +1,26 @@
 <div id="messages" class="screen">
-    <div class="head-screen"><span id="btn-head-back-msg" class="btn-head btn-head-back"></span>Messages
+    <div class="head-screen"><span id="btn-head-back-msg" class="btn-head btn-head-back"></span>{{locale.mainLabel}}
         <!--<span id="btn-head-new-message" class="btn-head btn-head-new"></span>-->
     </div>
     <div class="container">
         <div class="content-screen messages-list">
             <div class="message no-item">
-                <p class="no-item">No messages</p>
+                <p class="no-item">{{locale.noMessages}}</p>
             </div>
+        </div>
+    </div>
+</div>
+
+<div id="writer" class="screen">
+    <div class="head-screen"><span id="btn-head-back-writer" class="btn-head btn-head-back"></span><span
+            class="header-title"></span></div>
+    <div class="container">
+        <div class="content-screen">
+            <input type="hidden" id="writer_number" value="0" />
+            <textarea id="writer_message" placeholder="Your message"></textarea>
+            <label><input type="checkbox" id="writer_anonyme" value="true">{{locale.annonymous}}</label>
+            <button id="writer_cancel">{{locale.cancel}}</button>
+            <button id="writer_send" class="marged">{{locale.send}}</button>
         </div>
     </div>
 </div>

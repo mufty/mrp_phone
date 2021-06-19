@@ -22,6 +22,9 @@ $(function() {
         if (app.locale)
             count++;
 
+        if (app.style)
+            count++;
+
         return count;
     }
 
@@ -39,7 +42,22 @@ $(function() {
 
     function tryInit(appName, count) {
         if (Config.apps[appName]._dependencyCount <= count) {
-            APP[appName].init();
+
+            //set locale to app
+            let mergedLocale = {};
+            let globalLocale = Locale[Config.locale];
+            mergedLocale = Object.assign(mergedLocale, globalLocale);
+            let localAppLocale = Locale[appName][Config.locale];
+            mergedLocale = Object.assign(mergedLocale, localAppLocale);
+            APP[appName].locale = mergedLocale;
+
+            //set configuration
+            let appCfg = Config.apps[appName];
+            APP[appName].cfg = appCfg;
+
+            //call init and add HTML to container
+            let html = APP[appName].init();
+            $('#phoneApps').append(html);
             appLoaded(appName);
         }
     }
@@ -53,18 +71,19 @@ $(function() {
         if (appCfg.template) {
             //load main template
             $.ajax(`apps/${appCfg.template}`).done(data => {
+                appCfg.template = data;
                 dependencyCount++;
                 tryInit(appName, dependencyCount);
-                console.log(data);
             });
         }
         if (appCfg.extraTemplates && appCfg.extraTemplates.length > 0) {
-            for (let tmplUrl of appCfg.extraTemplates) {
+            for (let i in appCfg.extraTemplates) {
+                let tmplUrl = appCfg.extraTemplates;
                 //load extras templates
                 $.ajax(`apps/${tmplUrl}`).done(data => {
+                    appCfg.extraTemplates[i] = data;
                     dependencyCount++;
                     tryInit(appName, dependencyCount);
-                    console.log(data);
                 });
             }
         }
@@ -90,6 +109,12 @@ $(function() {
                 }
             });
         }
+
+        if (appCfg.style) {
+            //load style
+            $('head').append(`<link rel="stylesheet" href="apps/${appCfg.style}" type="text/css" />`);
+            dependencyCount++;
+        }
     }
 
     let ContactTpl =
@@ -106,25 +131,11 @@ $(function() {
         '</div>' +
         '</div>';
 
-    let MessageTpl =
-        '<div class="message">' +
-        '<div class="sender-info">' +
-        '<div class="center">' +
-        '<span class="sender">{{sender}}</span><br/><span class="phone-number">#{{phoneNumber}}</span>' +
-        '</div>' +
-        '</div>' +
-        '<div class="body">{{message}}</div>' +
-        '<div class="actions"><span class="new-msg {{anonyme}} reply-btn" data-contact-number="{{phoneNumberData}}" data-contact-name="{{senderData}}"></span></div>' +
-        '</div>';
-
     let SpecialContactTpl = '<li class="phone-icon" style="background-image: url(\'{{base64Icon}}\');" data-number="{{number}}" data-name="{{name}}">{{name}}</li>';
 
     let contacts = [];
     let specialContacts = [];
-    let menu = [];
-    let currentItem = 0;
     let currentVal = null;
-    let isMessageEditorOpen = false;
     let isMessagesOpen = false;
     let isPhoneShowed = false;
 
@@ -141,16 +152,6 @@ $(function() {
         $('#repertoire').removeClass('active');
     }
 
-    let showMessages = function() {
-        $('#messages').addClass('active');
-        isMessagesOpen = true;
-    }
-
-    let hideMessages = function() {
-        $('#messages').removeClass('active');
-        isMessagesOpen = false;
-    }
-
     let showAddContact = function() {
         $('#contact').addClass('active');
         $('.screen *').attr('disabled', 'disabled');
@@ -161,21 +162,6 @@ $(function() {
         $('#contact').removeClass('active');
         $('#contact_name').val('');
         $('#contact_number').val('');
-    }
-
-    let showNewMessage = function(cnum, cname) {
-        $('#writer').addClass('active');
-        $('#writer_number').val(cnum);
-        $('#writer .header-title').html(cname);
-        $('.screen *').attr('disabled', 'disabled');
-        $('.screen.active *').removeAttr('disabled');
-    }
-
-    let hideNewMessage = function() {
-        $('#writer').removeClass('active');
-        $('#writer_number').val('');
-        $('#writer_message').val('');
-        $('#writer .header-title').html('');
     }
 
     let renderContacts = function() {
@@ -217,7 +203,7 @@ $(function() {
         });
 
         $('.contact .new-msg').click(function() {
-            showNewMessage($(this).attr('data-contact-number'), $(this).attr('data-contact-name'));
+            APP.message.showNewMessage($(this).attr('data-contact-number'), $(this).attr('data-contact-name'));
         });
 
         $('.contact .new-call').click(function() {
@@ -232,7 +218,7 @@ $(function() {
     }
 
     $('.contact .new-msg').click(function() {
-        showNewMessage($(this).attr('data-contact-number'));
+        APP.message.showNewMessage($(this).attr('data-contact-number'));
     });
 
     let reloadPhone = function(phoneData) {
@@ -262,77 +248,6 @@ $(function() {
     let hidePhone = function() {
         $('#phone').hide();
         isPhoneShowed = false;
-    }
-
-    let messages = [];
-
-    let addMessage = function(phoneNumber, pmessage, pposition, panonyme, pjob) {
-
-        messages.push({
-            value: phoneNumber,
-            message: pmessage,
-            position: pposition,
-            anonyme: panonyme,
-            job: pjob
-        })
-
-        let messageHTML = '';
-
-        if (messages.length > 0) {
-
-            for (let i = 0; i < messages.length; i++) {
-                let fromName = "Unknown";
-                let fromNumber = messages[i].value;
-                let anonyme = null;
-
-                if (messages[i].anonyme) {
-
-                    fromName = "Anonymous";
-                    fromNumber = "Anonymous";
-                    anonyme = 'anonyme';
-
-                } else {
-
-                    for (let j = 0; j < contacts.length; j++)
-                        if (contacts[j].value == messages[i].value)
-                            fromName = contacts[j].label;
-
-                    anonyme = '';
-                }
-
-                let view = {
-                    anonyme: anonyme,
-                    phoneNumber: fromNumber,
-                    sender: fromName,
-                    message: messages[i].message,
-                    phoneNumberData: fromNumber,
-                    senderData: fromName
-                }
-
-                let html = Mustache.render(MessageTpl, view);
-
-                messageHTML = html + messageHTML;
-            }
-        } else {
-            messageHTML = '<div class="message no-item"><p class="no-item">No messages</p></div>';
-        }
-
-        $('#phone #messages .messages-list').html(messageHTML);
-
-        $('.message .new-msg').click(function() {
-            showNewMessage($(this).attr('data-contact-number'), $(this).attr('data-contact-name'));
-        });
-    }
-
-    let scrollMessages = function(direction) {
-
-        let element = $('#messages .container')[0];
-
-        if (direction == 'UP')
-            element.scrollTop -= 100;
-
-        if (direction == 'DOWN')
-            element.scrollTop += 100;
     }
 
     let addSpecialContact = function(name, number, base64Icon) {
@@ -399,41 +314,13 @@ $(function() {
                     break;
                 }
 
-                case 'phone-icon-msg': {
-                    showMessages();
-                    break;
-                }
-
                 default: {
-
-                    let number = $(this).data('number');
-                    let name = $(this).data('name');
-
-                    showNewMessage(number, name);
-
                     break;
                 }
             }
 
         });
     }
-
-    $('#writer_send').click(function() {
-
-        let phoneNumber = null
-
-        if (typeof $('#writer_number').val() == 'number')
-            phoneNumber = parseInt($('#writer_number').val());
-        else if (typeof $('#writer_number').val() == 'string')
-            phoneNumber = $('#writer_number').val();
-
-        $.post('http://mrp_phone/send', JSON.stringify({
-            message: $('#writer_message').val(),
-            number: phoneNumber,
-            anonyme: $('#writer_anonyme').is(':checked')
-        }))
-
-    });
 
     $('#contact_send').click(function() {
 
@@ -445,25 +332,12 @@ $(function() {
     });
 
     // ACTIONS BTNS
-    $('#btn-head-back-msg').click(function() {
-        hideNewMessage();
-        hideMessages();
-    });
-
     $('#btn-head-back-rep').click(function() {
         hideRepertoire();
     });
 
-    $('#btn-head-back-writer, #writer_cancel').click(function() {
-        hideNewMessage();
-    });
-
     $('#btn-head-back-contact, #contact_cancel').click(function() {
         hideAddContact();
-    });
-
-    $('#btn-head-new-message').click(function() {
-        showNewMessage('', 'New message');
     });
 
     $('#btn-head-new-contact').click(function() {
@@ -481,18 +355,7 @@ $(function() {
                 break;
             }
 
-            case 'phone-icon-msg': {
-                showMessages();
-                break;
-            }
-
             default: {
-
-                let number = $(this).data('number');
-                let name = $(this).data('name');
-
-                showNewMessage(number, name);
-
                 break;
             }
         }
@@ -501,9 +364,15 @@ $(function() {
 
     window.onData = function(data) {
 
-        if (data.scroll === true) {
-            if (isMessagesOpen)
-                scrollMessages(data.direction);
+        if (data.app) {
+            if (data.app == 'global') {
+                //global data send to all apps
+                for (let appName in APP) {
+                    APP[appName].event(data);
+                }
+            } else {
+                APP[data.app].event(data);
+            }
         }
 
         if (data.reloadPhone === true) {
@@ -516,22 +385,6 @@ $(function() {
 
         if (data.showPhone === false) {
             hidePhone();
-        }
-
-        if (data.showMessageEditor === false) {
-            hideNewMessage();
-        }
-
-        if (data.newMessage === true) {
-            addMessage(data.phoneNumber, data.message, data.position, data.anonyme, data.job);
-        }
-
-        if (data.fillMessages === true) {
-            if (data.messages && data.messages.length > 0) {
-                for (let message of data.messages) {
-                    addMessage(message.from, message.message, null, message.from == "anonymous", null);
-                }
-            }
         }
 
         if (data.contactAdded === true) {
@@ -549,29 +402,6 @@ $(function() {
 
         if (data.removeSpecialContact === true) {
             removeSpecialContact(data.number);
-        }
-
-        if (data.move && isPhoneShowed) {
-
-            if (data.move == 'UP') {
-                scroll('UP');
-            }
-
-            if (data.move == 'DOWN') {
-                scroll('DOWN');
-            }
-        }
-
-        if (data.enterPressed) {
-
-            if (isPhoneShowed) {
-
-                $.post('http://mrp_phone/select', JSON.stringify({
-                    val: currentVal
-                }));
-
-            }
-
         }
 
     }
