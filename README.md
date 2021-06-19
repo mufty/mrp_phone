@@ -60,7 +60,7 @@ class MyApp {
     }
 
     start() {
-        
+        //this is called the first thing when the application icon is clicked on the phone's main screen
     }
 }
 
