@@ -20,6 +20,7 @@ Config = {
             style: 'myapp/style.css',                           //OPTIONAL: if you want to have a separate CSS style file this is where you put it
             locale: 'myapp/locale.js'                           //OPTIONAL: your application locale file if needed
         }
+    }
 };
 ```
 In all your HTML files you can use [mustache.js](https://github.com/janl/mustache.js) for templates.
