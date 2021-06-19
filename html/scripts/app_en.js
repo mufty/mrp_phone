@@ -1,4 +1,96 @@
+APP = {};
+
 $(function() {
+
+    function getDependencyCount(app) {
+        let count = 0;
+        if (app.template)
+            count++;
+
+        if (app.extraTemplates && app.extraTemplates.length > 0) {
+            for (let tmplUrl of app.extraTemplates) {
+                count++;
+            }
+        }
+
+        if (app.scripts && app.scripts.length > 0) {
+            for (let src of app.scripts) {
+                count++;
+            }
+        }
+
+        if (app.locale)
+            count++;
+
+        return count;
+    }
+
+    function appLoaded(appName) {
+        if (Config.apps[appName]) {
+            // add app icon
+            let iconHtml = `<li class="phone-icon" id="${Config.apps[appName].menuId}">${Locale[Config.locale][appName]}</li>`;
+            iconHtml = $(iconHtml);
+            iconHtml.click(() => {
+                APP[appName].start();
+            });
+            $('.menu .home').append(iconHtml);
+        }
+    }
+
+    function tryInit(appName, count) {
+        if (Config.apps[appName]._dependencyCount <= count) {
+            APP[appName].init();
+            appLoaded(appName);
+        }
+    }
+
+    //load apps
+    for (let appName in Config.apps) {
+        console.log(`Loading phone app: ${appName}`);
+        let appCfg = Config.apps[appName];
+        appCfg._dependencyCount = getDependencyCount(appCfg);
+        let dependencyCount = 0;
+        if (appCfg.template) {
+            //load main template
+            $.ajax(`apps/${appCfg.template}`).done(data => {
+                dependencyCount++;
+                tryInit(appName, dependencyCount);
+                console.log(data);
+            });
+        }
+        if (appCfg.extraTemplates && appCfg.extraTemplates.length > 0) {
+            for (let tmplUrl of appCfg.extraTemplates) {
+                //load extras templates
+                $.ajax(`apps/${tmplUrl}`).done(data => {
+                    dependencyCount++;
+                    tryInit(appName, dependencyCount);
+                    console.log(data);
+                });
+            }
+        }
+        if (appCfg.scripts && appCfg.scripts.length > 0) {
+            for (let src of appCfg.scripts) {
+                //load scripts
+                $.getScript(`apps/${src}`, (data, textStatus, jqxhr) => {
+                    dependencyCount++;
+                    tryInit(appName, dependencyCount);
+                    if (jqxhr.status == 200) {
+                        console.log(`script loaded ${src}`);
+                    }
+                });
+            }
+        }
+        if (appCfg.locale) {
+            //load locale
+            $.getScript(`apps/${appCfg.locale}`, (data, textStatus, jqxhr) => {
+                dependencyCount++;
+                tryInit(appName, dependencyCount);
+                if (jqxhr.status == 200) {
+                    console.log(`locale loaded ${appCfg.locale}`);
+                }
+            });
+        }
+    }
 
     let ContactTpl =
         '<div class="contact {{online}}">' +

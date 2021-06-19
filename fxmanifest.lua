@@ -33,6 +33,9 @@ files {
 	'html/img/*.png',
 
 	'html/img/icons/*.png',
+    'html/apps/**/*.js',
+    'html/apps/**/*.html',
+    'html/apps/**/*.css',
 }
 
 dependency 'mrp_core'
