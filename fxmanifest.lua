@@ -4,7 +4,7 @@ game 'gta5'
 
 description 'MRP Phone'
 
-version '0.0.1'
+version '2.0.0'
 
 server_scripts {
 	'config.lua',
