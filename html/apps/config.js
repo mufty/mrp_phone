@@ -1,5 +1,13 @@
 Config = {
     apps: {
+        contact: {
+            menuId: 'phone-icon-rep',
+            template: 'contact/templates/screen.html',
+            extraTemplates: ['contact/templates/contact.html'],
+            scripts: ['contact/scripts/contact.js'],
+            style: 'contact/style.css',
+            locale: 'contact/locale.js'
+        },
         message: {
             menuId: 'phone-icon-msg',
             template: 'message/templates/screen.html',
@@ -15,7 +23,9 @@ Config = {
 Locale = {
     en: {
         message: "Messages",
+        contact: "Contacts",
         cancel: "Cancel",
-        annonymous: "Annonymous"
+        annonymous: "Annonymous",
+        unknown: "Unknown"
     }
 };

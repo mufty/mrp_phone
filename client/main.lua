@@ -124,6 +124,7 @@ AddEventHandler('mrp_phone:addContact', function(name, phoneNumber, playerOnline
 	})
 
 	SendNUIMessage({
+        app          = 'global',
 		contactAdded = true,
 		phoneData    = PhoneData
 	})
@@ -139,6 +140,7 @@ AddEventHandler('mrp_phone:removeContact', function(name, phoneNumber)
 	end
 
 	SendNUIMessage({
+        app            = 'global',
 		contactRemoved = true,
 		phoneData      = PhoneData
 	})

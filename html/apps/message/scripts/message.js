@@ -144,7 +144,6 @@ class Message {
     }
 
     init() {
-        console.log("init app message called!");
         let html = $(Mustache.render(this.cfg.template, {
             locale: this.locale
         }));

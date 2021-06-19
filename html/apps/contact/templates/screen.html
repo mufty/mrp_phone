@@ -1,0 +1,25 @@
+<div id="contacts" class="screen">
+    <div class="head-screen">
+        <span id="btn-head-back-rep" class="btn-head btn-head-back"></span>{{locale.mainLabel}}
+        <span id="btn-head-new-contact" class="btn-head btn-head-new"></span>
+    </div>
+    <div class="container">
+        <div class="content-screen contacts-list">
+            <div class="contact no-item online">
+                <p class="no-item">{{locale.noContacts}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="contact" class="screen">
+    <div class="head-screen"><span id="btn-head-back-contact" class="btn-head btn-head-back"></span>{{locale.addAContact}}</div>
+    <div class="container">
+        <div class="content-screen">
+            <input type="text" id="contact_name" placeholder="Name" />
+            <input type="text" id="contact_number" placeholder="Number" />
+            <button id="contact_cancel">{{locale.cancel}}</button>
+            <button id="contact_send">{{locale.add}}</button>
+        </div>
+    </div>
+</div>

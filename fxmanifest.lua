@@ -20,15 +20,15 @@ client_scripts {
 	'client/*.lua'
 }
 
-ui_page 'html/ui_en.html'
+ui_page 'html/ui.html'
 
 files {
-	'html/ui_en.html',
+	'html/ui.html',
 
 	'html/css/app.css',
 
 	'html/scripts/mustache.min.js',
-	'html/scripts/app_en.js',
+	'html/scripts/app.js',
 
 	'html/img/*.png',
 
