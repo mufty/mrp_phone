@@ -1,0 +1,15 @@
+#notifications {
+    z-index: 10;
+    position: absolute;
+    width: inherit;
+}
+
+#notifications .notification {
+    background-color: rgba(0, 0, 0, 0.8);
+    margin: 5px;
+    border-radius: 5px;
+    color: #ffffff;
+    padding: 5px;
+    top: -60px;
+    position: relative;
+}

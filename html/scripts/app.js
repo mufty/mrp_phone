@@ -29,7 +29,7 @@ $(function() {
     }
 
     function appLoaded(appName) {
-        if (Config.apps[appName]) {
+        if (Config.apps[appName] && Config.apps[appName].menuId) {
             // add app icon
             let iconHtml = `<li class="phone-icon" id="${Config.apps[appName].menuId}">${Locale[Config.locale][appName]}</li>`;
             iconHtml = $(iconHtml);
@@ -117,7 +117,7 @@ $(function() {
         }
     }
 
-    let isPhoneShowed = false;
+    isPhoneShowed = false;
 
     let showMain = function() {
         $('.screen').removeClass('active');
@@ -129,6 +129,7 @@ $(function() {
     }
 
     let showPhone = function(phoneData) {
+        $('#phone').css('bottom', '0px');
         reloadPhone(phoneData);
         $('#phone').show();
         showMain();

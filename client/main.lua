@@ -12,8 +12,6 @@ Citizen.CreateThread(function()
 		TriggerEvent('mrp:getSharedObject', function(obj) MRP = obj end)
 		Citizen.Wait(0)
 	end
-
-	--MRP.UI.Menu.RegisterType('phone', OpenPhone, ClosePhone)
 end)
 
 RegisterCommand('togglePhone', function()
@@ -31,7 +29,7 @@ RegisterCommand('triggerCall', function()
         exports['pma-voice']:removePlayerFromCall(callChannel)
         callChannel = -1
         isOnCall = false
-        MRP.Notification(_U('call_ended'), 10000)
+        TriggerEvent('mrp_phone:showNotification', _U('call_ended'), 'call_ended')
         print('------------------')
         print('hangup call')
         print(PhoneData.phoneNumber)
@@ -52,6 +50,12 @@ RegisterCommand('triggerCall', function()
         SendNUIMessage({
             app         = 'settings',
     		stopRinging = true
+    	})
+        SendNUIMessage({
+            app                = 'notifications',
+    		removeNotification = true,
+            id                 = 'call_inc'
+            
     	})
         TriggerServerEvent('mrp_phone:pickupCall', PhoneData.phoneNumber, callChannel)
         PhonePlayCall()
@@ -115,7 +119,7 @@ AddEventHandler('mrp_phone:callEnded', function(call_channel)
         exports['pma-voice']:removePlayerFromCall(call_channel)
         callChannel = -1
         isOnCall = false
-        MRP.Notification(_U('call_ended'), 10000)
+        TriggerEvent('mrp_phone:showNotification', _U('call_ended'), 'call_ended')
         PhonePlayText()
     end
 end)
@@ -158,7 +162,7 @@ RegisterNUICallback('add_contact', function(data, cb)
 	if phoneNumber then
 		TriggerServerEvent('mrp_phone:addPlayerContact', phoneNumber, contactName)
 	else
-		MRP.Notification(_U('invalid_number'), 10000)
+        TriggerEvent('mrp_phone:showNotification', _U('invalid_number'), 'invalid_number')
 	end
 end)
 
@@ -171,6 +175,16 @@ RegisterNUICallback('remove_contact', function(data, cb)
 	end
 end)
 
+AddEventHandler('mrp_phone:showNotification', function(message, id, sticky)
+    SendNUIMessage({
+        app              = 'notifications',
+        showNotification = true,
+        msg              = message,
+        id               = id,
+        sticky           = sticky
+    })
+end)
+
 RegisterNUICallback('start_call', function(data, cb)
 	local phoneNumber = data.phoneNumber
 	local contactName = data.contactName
@@ -179,7 +193,7 @@ RegisterNUICallback('start_call', function(data, cb)
 	if phoneNumber then
         local serverId = GetPlayerServerId(PlayerId())
         exports['pma-voice']:setCallChannel(serverId)
-        MRP.Notification(_U('call_started'), 10000)
+        TriggerEvent('mrp_phone:showNotification', _U('call_started'), 'call_started')
         callChannel = serverId
         isOnCall = true
         ClosePhone()
@@ -213,7 +227,7 @@ AddEventHandler('mrp_phone:incCall', function(fromPhoneNumber, name, call_channe
         app          = 'settings',
 		startRinging = true
 	})
-    MRP.Notification(_U('call_inc', name, fromPhoneNumber), 10000)
+    TriggerEvent('mrp_phone:showNotification', _U('call_inc', name, fromPhoneNumber), 'call_inc', true)
 end)
 
 RegisterNetEvent('mrp_phone:loadTextMessages')
@@ -243,7 +257,7 @@ AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, anon)
 		playNotificationSound = true
 	})
 
-    MRP.Notification(('~b~%s:~s~ %s'):format(msgFrom, message), 10000)
+    TriggerEvent('mrp_phone:showNotification', ('~b~%s:~s~ %s'):format(msgFrom, message), 'new_message')
 
 	PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
 
@@ -300,8 +314,8 @@ RegisterNUICallback('send', function(data)
         app = "message",
 		showMessageEditor = false
 	})
-
-	MRP.Notification(_U('message_sent'), 10000)
+    
+    TriggerEvent('mrp_phone:showNotification', _U('message_sent'), 'message_sent')
 end)
 
 RegisterNUICallback('escape', function()

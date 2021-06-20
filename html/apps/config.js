@@ -25,6 +25,15 @@ Config = {
             background: 'https://wallpapersfortech.com/wp-content/uploads/2020/08/GTA-Online-Los-Santos-Sunset-Phone-Wallpaper.jpg',
             ringtone: 'https://www.youtube.com/embed/pe1ZXh5_wk4',
             notification: 'https://www.youtube.com/embed/AiMbf0ovXT4'
+        },
+        notifications: {
+            template: 'notifications/templates/screen.html',
+            extraTemplates: ['notifications/templates/notification.html'],
+            scripts: ['notifications/scripts/notifications.js'],
+            style: 'notifications/style.css',
+            locale: 'notifications/locale.js',
+            animationLength: 500,
+            notificationLifetime: 10000
         }
     },
     locale: 'en'

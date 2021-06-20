@@ -1,0 +1,5 @@
+Locale['notifications'] = {
+    en: {
+
+    }
+};
