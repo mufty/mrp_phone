@@ -22,3 +22,34 @@
 #settings_bg .notification {
     display: none;
 }
+
+#settings button {
+    display: block;
+    float: left;
+    width: 103px;
+    height: 30px;
+    line-height: 30px;
+    background-color: #dcdcdc;
+    border-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+}
+
+#settings button.marged {
+    margin-left: 1px;
+}
+
+#settings #setting_cancel {
+    background-color: #d9534f;
+}
+
+#settings #setting_save {
+    background-color: #5cb85c;
+}
+
+#settings label, #settings label input {
+    margin: 5px;
+}

@@ -49,6 +49,10 @@ RegisterCommand('triggerCall', function()
         print(PhoneData.phoneNumber)
         print(callChannel)
         print('------------------')
+        SendNUIMessage({
+            app         = 'settings',
+    		stopRinging = true
+    	})
         TriggerServerEvent('mrp_phone:pickupCall', PhoneData.phoneNumber, callChannel)
         PhonePlayCall()
         exports['pma-voice']:setCallChannel(callChannel)
@@ -89,9 +93,10 @@ function ClosePhone()
 end
 
 RegisterNetEvent('mrp_phone:loaded')
-AddEventHandler('mrp_phone:loaded', function(phoneNumber, contacts)
+AddEventHandler('mrp_phone:loaded', function(phoneNumber, contacts, settings)
 	PhoneData.phoneNumber = phoneNumber
 	PhoneData.contacts = {}
+    PhoneData.settings = settings
 
 	for i=1, #contacts, 1 do
 		table.insert(PhoneData.contacts, contacts[i])
@@ -181,12 +186,33 @@ RegisterNUICallback('start_call', function(data, cb)
         PhonePlayCall()
 		TriggerServerEvent('mrp_phone:startCall', phoneNumber, char.phoneNumber, char.name .. ' ' .. char.surname, serverId)
 	end
+    cb({})
+end)
+
+RegisterNUICallback('save_settings', function(data, cb)
+	local phoneNumber = data.number
+    local notification = data.notification
+    local ringtone = data.ringtone
+    local background = data.background
+
+	if phoneNumber then
+		TriggerServerEvent('mrp_phone:updateSettings', phoneNumber, {
+            notification = notification,
+            ringtone = ringtone,
+            background = background
+        })
+	end
+    cb({})
 end)
 
 RegisterNetEvent('mrp_phone:incCall')
 AddEventHandler('mrp_phone:incCall', function(fromPhoneNumber, name, call_channel)
     callChannel = call_channel
     incCall = true
+    SendNUIMessage({
+        app          = 'settings',
+		startRinging = true
+	})
     MRP.Notification(_U('call_inc', name, fromPhoneNumber), 10000)
 end)
 
@@ -211,6 +237,11 @@ AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, anon)
             end
         end
     end
+    
+    SendNUIMessage({
+        app                   = 'settings',
+		playNotificationSound = true
+	})
 
     MRP.Notification(('~b~%s:~s~ %s'):format(msgFrom, message), 10000)
 

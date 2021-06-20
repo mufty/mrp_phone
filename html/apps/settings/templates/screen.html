@@ -8,10 +8,10 @@
             class="header-title">{{locale.settings}}</span></div>
     <div class="container">
         <div class="content-screen">
-            <input type="hidden" id="phone_number" value="0" />
-            <label>{{locale.background}}<input type="text" id="setting_background" value="true"></label>
-            <label>{{locale.ringtone}}<input type="text" id="setting_ringtone" value="true"></label>
-            <label>{{locale.notification}}<input type="text" id="setting_notification" value="true"></label>
+            <input type="hidden" id="setting_phone_number" value="0" />
+            <label>{{locale.background}}<input type="text" id="setting_background" value="{{cfg.background}}"></label>
+            <label>{{locale.ringtone}}<input type="text" id="setting_ringtone" value="{{cfg.ringtone}}"></label>
+            <label>{{locale.notification}}<input type="text" id="setting_notification" value="{{cfg.notification}}"></label>
             <button id="setting_cancel">{{locale.cancel}}</button>
             <button id="setting_save" class="marged">{{locale.save}}</button>
         </div>

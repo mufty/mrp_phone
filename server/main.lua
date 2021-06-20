@@ -22,7 +22,8 @@ function UsePhoneNumber(phone_number, source, char)
     MRP.read('phone', {phoneNumber = phone_number}, function(res)
     	TriggerEvent('mrp_phone:addSource', phone_number, source)
         local contacts = fillContactStates(res.contacts)
-        TriggerClientEvent('mrp_phone:loaded', source, phone_number, contacts)
+        local settings = res.settings
+        TriggerClientEvent('mrp_phone:loaded', source, phone_number, contacts, settings)
     end)
 end
 
@@ -134,7 +135,7 @@ AddEventHandler('mrp_phone:reload', function(phone_number)
     MRP.read('phone', {phoneNumber = phone_number}, function(res)
         if res ~= nil then
             local contacts = fillContactStates(res.contacts)
-            TriggerClientEvent('mrp_phone:loaded', playerId, phone_number, contacts)
+            TriggerClientEvent('mrp_phone:loaded', playerId, phone_number, contacts, res.settings)
         else
             TriggerClientEvent('mrp:showNotification', playerId, _U('get_contacts_error'))
         end
@@ -305,6 +306,18 @@ AddEventHandler('mrp_phone:removePlayerContact', function(phoneNumber, contactNa
 			TriggerClientEvent('esx:showNotification', playerId, _U('number_not_assigned'))
 		end
 	end)
+end)
+
+RegisterServerEvent('mrp_phone:updateSettings')
+AddEventHandler('mrp_phone:updateSettings', function(phoneNumber, settings)
+    local playerId = source
+    MRP.update('phone', {settings = settings}, {phoneNumber = phoneNumber}, {upsert=true}, function(res)
+        MRP.read('phone', {phoneNumber = phoneNumber}, function(result)
+            local contacts = fillContactStates(result.contacts)
+            local settings = result.settings
+            TriggerClientEvent('mrp_phone:loaded', playerId, phoneNumber, contacts, settings)
+        end)
+    end)
 end)
 
 RegisterCommand('pn', function(source, args, rawCommand)
