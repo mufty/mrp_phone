@@ -1,0 +1,19 @@
+<div id="settings_bg" class="phone_bg">
+    <div class="ringtone"></div>
+    <div class="notification"></div>
+</div>
+
+<div id="settings" class="screen">
+    <div class="head-screen"><span id="btn-settings-back" class="btn-head btn-head-back"></span><span
+            class="header-title">{{locale.settings}}</span></div>
+    <div class="container">
+        <div class="content-screen">
+            <input type="hidden" id="phone_number" value="0" />
+            <label>{{locale.background}}<input type="text" id="setting_background" value="true"></label>
+            <label>{{locale.ringtone}}<input type="text" id="setting_ringtone" value="true"></label>
+            <label>{{locale.notification}}<input type="text" id="setting_notification" value="true"></label>
+            <button id="setting_cancel">{{locale.cancel}}</button>
+            <button id="setting_save" class="marged">{{locale.save}}</button>
+        </div>
+    </div>
+</div>

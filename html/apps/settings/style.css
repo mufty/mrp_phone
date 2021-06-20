@@ -1,0 +1,24 @@
+#phone-icon-settings {
+    background-image: url("../../img/icons/settings.png");
+}
+
+#settings_bg {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 207px;
+    height: 365px;
+    z-index: 1;
+    transition: left 0.25s ease;
+    overflow: hidden;
+    background-size: cover;
+}
+
+#settings_bg .ringtone {
+    display: none;
+}
+
+#settings_bg .notification {
+    display: none;
+}
