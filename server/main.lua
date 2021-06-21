@@ -168,7 +168,14 @@ end)
 
 RegisterServerEvent('mrp_phone:pickupCall')
 AddEventHandler('mrp_phone:pickupCall', function(callChannel)
-    local xPlayer = MRP.getSpawnedCharacter(source)
+    local playerId = source
+    print('------------------')
+    print('pickupCall')
+    print(playerId)
+    print(callChannel)
+    print('------------------')
+    
+    local xPlayer = MRP.getSpawnedCharacter(playerId)
     if PhoneNumbers[xPlayer.phoneNumber] then
         PhoneNumbers[xPlayer.phoneNumber].activeCallChannel = callChannel
     end
@@ -180,22 +187,19 @@ AddEventHandler('mrp_phone:endCall', function(callChannel)
     print('ending call')
     print(callChannel)
     print('------------------')
-    local xPlayer = MRP.getSpawnedCharacter(source)
-    if PhoneNumbers[xPlayer.phoneNumber] then
-        for k,v in pairs(PhoneNumbers) do
-            if v.activeCallChannel ~= nil and v.activeCallChannel == callChannel then
-                v.activeCallChannel = nil
-                
-                for i,s in pairs(v.sources) do
-                    local numSource = tonumber(i)
-                    print('------------------')
-                    print('sending mrp_phone:callEnded to')
-                    print(numSource)
-                    print('for channel')
-                    print(callChannel)
-                    print('------------------')
-                    TriggerClientEvent('mrp_phone:callEnded', numSource, callChannel)
-                end
+    for k,v in pairs(PhoneNumbers) do
+        if v.activeCallChannel ~= nil and v.activeCallChannel == callChannel then
+            v.activeCallChannel = nil
+            
+            for i,s in pairs(v.sources) do
+                local numSource = tonumber(i)
+                print('------------------')
+                print('sending mrp_phone:callEnded to')
+                print(numSource)
+                print('for channel')
+                print(callChannel)
+                print('------------------')
+                TriggerClientEvent('mrp_phone:callEnded', numSource, callChannel)
             end
         end
     end

@@ -123,6 +123,10 @@ AddEventHandler('mrp_phone:callEnded', function(call_channel)
         callChannel = -1
         isOnCall = false
         TriggerEvent('mrp_phone:showNotification', _U('call_ended'), 'call_ended')
+        SendNUIMessage({
+            app         = 'settings',
+    		stopRinging = true
+    	})
         PhonePlayText()
         if not GUI.PhoneIsShowed then
             ClosePhone()
