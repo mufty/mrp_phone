@@ -27,8 +27,6 @@ RegisterKeyMapping('togglePhone', 'Open phone', 'keyboard', 'b')
 RegisterCommand('triggerCall', function()
     if isOnCall and callChannel ~= -1 then --end call
         exports['pma-voice']:removePlayerFromCall(callChannel)
-        callChannel = -1
-        isOnCall = false
         TriggerEvent('mrp_phone:showNotification', _U('call_ended'), 'call_ended')
         print('------------------')
         print('hangup call')
@@ -36,6 +34,8 @@ RegisterCommand('triggerCall', function()
         print(callChannel)
         print('------------------')
         TriggerServerEvent('mrp_phone:endCall', callChannel)
+        callChannel = -1
+        isOnCall = false
         PhonePlayText()
         Citizen.Wait(500)
         PhonePlayOut()
