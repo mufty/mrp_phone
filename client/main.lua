@@ -124,6 +124,9 @@ AddEventHandler('mrp_phone:callEnded', function(call_channel)
         isOnCall = false
         TriggerEvent('mrp_phone:showNotification', _U('call_ended'), 'call_ended')
         PhonePlayText()
+        if not GUI.PhoneIsShowed then
+            ClosePhone()
+        end
     end
 end)
 
