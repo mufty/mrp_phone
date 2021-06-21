@@ -121,6 +121,7 @@ AddEventHandler('mrp_phone:callEnded', function(call_channel)
         exports['pma-voice']:removePlayerFromCall(call_channel)
         callChannel = -1
         isOnCall = false
+        incCall = false
         TriggerEvent('mrp_phone:showNotification', _U('call_ended'), 'call_ended')
         SendNUIMessage({
             app         = 'settings',
