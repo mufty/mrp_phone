@@ -44,7 +44,6 @@ RegisterCommand('triggerCall', function()
     if incCall then
         print('------------------')
         print('client pickup call')
-        print(PhoneData.phoneNumber)
         print(callChannel)
         print('------------------')
         SendNUIMessage({
@@ -57,7 +56,7 @@ RegisterCommand('triggerCall', function()
             id                 = 'call_inc'
             
     	})
-        TriggerServerEvent('mrp_phone:pickupCall', PhoneData.phoneNumber, callChannel)
+        TriggerServerEvent('mrp_phone:pickupCall', callChannel)
         PhonePlayCall()
         exports['pma-voice']:setCallChannel(callChannel)
         isOnCall = true

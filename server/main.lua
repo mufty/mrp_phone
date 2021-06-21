@@ -174,7 +174,6 @@ AddEventHandler('mrp_phone:pickupCall', function(callChannel)
     print(playerId)
     print(callChannel)
     print('------------------')
-    
     local xPlayer = MRP.getSpawnedCharacter(playerId)
     if PhoneNumbers[xPlayer.phoneNumber] then
         PhoneNumbers[xPlayer.phoneNumber].activeCallChannel = callChannel
