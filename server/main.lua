@@ -148,20 +148,22 @@ end)
 
 RegisterServerEvent('mrp_phone:startCall')
 AddEventHandler('mrp_phone:startCall', function(phoneNumber, fromPhoneNumber, name, callChannel)
+    local playerId = source
     if PhoneNumbers[phoneNumber] then
         
         if PhoneNumbers[phoneNumber].activeCallChannel == nil then
             PhoneNumbers[phoneNumber].activeCallChannel = callChannel
-        end
-        
-        for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
-            local numSource = tonumber(k)
             
-            PhoneNumbers[fromPhoneNumber].activeCallChannel = callChannel
-            print(PhoneNumbers[fromPhoneNumber].online)
-            print(PhoneNumbers[fromPhoneNumber].activeCallChannel)
-
-            TriggerClientEvent('mrp_phone:incCall', numSource, fromPhoneNumber, name, callChannel)
+            for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
+                local numSource = tonumber(k)
+                
+                PhoneNumbers[fromPhoneNumber].activeCallChannel = callChannel
+    
+                TriggerClientEvent('mrp_phone:incCall', numSource, fromPhoneNumber, name, callChannel)
+            end
+        else
+            --immediatly hangup phone the target is already on call
+            TriggerClientEvent('mrp_phone:callEnded', playerId, callChannel)
         end
     end
 end)
@@ -169,11 +171,6 @@ end)
 RegisterServerEvent('mrp_phone:pickupCall')
 AddEventHandler('mrp_phone:pickupCall', function(callChannel)
     local playerId = source
-    print('------------------')
-    print('pickupCall')
-    print(playerId)
-    print(callChannel)
-    print('------------------')
     local xPlayer = MRP.getSpawnedCharacter(playerId)
     if PhoneNumbers[xPlayer.phoneNumber] then
         PhoneNumbers[xPlayer.phoneNumber].activeCallChannel = callChannel
@@ -182,22 +179,12 @@ end)
 
 RegisterServerEvent('mrp_phone:endCall')
 AddEventHandler('mrp_phone:endCall', function(callChannel)
-    print('------------------')
-    print('ending call')
-    print(callChannel)
-    print('------------------')
     for k,v in pairs(PhoneNumbers) do
         if v.activeCallChannel ~= nil and v.activeCallChannel == callChannel then
             v.activeCallChannel = nil
             
             for i,s in pairs(v.sources) do
                 local numSource = tonumber(i)
-                print('------------------')
-                print('sending mrp_phone:callEnded to')
-                print(numSource)
-                print('for channel')
-                print(callChannel)
-                print('------------------')
                 TriggerClientEvent('mrp_phone:callEnded', numSource, callChannel)
             end
         end

@@ -28,11 +28,6 @@ RegisterCommand('triggerCall', function()
     if isOnCall and callChannel ~= -1 then --end call
         exports['pma-voice']:removePlayerFromCall(callChannel)
         TriggerEvent('mrp_phone:showNotification', _U('call_ended'), 'call_ended')
-        print('------------------')
-        print('hangup call')
-        print(PhoneData.phoneNumber)
-        print(callChannel)
-        print('------------------')
         TriggerServerEvent('mrp_phone:endCall', callChannel)
         callChannel = -1
         isOnCall = false
@@ -42,10 +37,6 @@ RegisterCommand('triggerCall', function()
     end
     
     if incCall then
-        print('------------------')
-        print('client pickup call')
-        print(callChannel)
-        print('------------------')
         SendNUIMessage({
             app         = 'settings',
     		stopRinging = true
