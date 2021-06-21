@@ -149,6 +149,11 @@ end)
 RegisterServerEvent('mrp_phone:startCall')
 AddEventHandler('mrp_phone:startCall', function(phoneNumber, fromPhoneNumber, name, callChannel)
     if PhoneNumbers[phoneNumber] then
+        
+        if PhoneNumbers[phoneNumber].activeCallChannel == nil then
+            PhoneNumbers[phoneNumber].activeCallChannel = callChannel
+        end
+        
         for k,v in pairs(PhoneNumbers[phoneNumber].sources) do
             local numSource = tonumber(k)
             
