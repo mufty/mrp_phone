@@ -60,6 +60,7 @@ class Notifications {
         }
 
         if (this.pendingNotifications[id]) {
+            console.log("this.pendingNotifications[id] .. remove");
             this.removeNotification(id);
         }
 
@@ -71,6 +72,7 @@ class Notifications {
             top: '0px'
         }, this.cfg.animationLength);
         notification.click(() => {
+            console.log("notification.click .. remove");
             this.removeNotification(id);
         });
 
@@ -79,6 +81,7 @@ class Notifications {
         if (!sticky) {
             //delete notification after some time
             setTimeout(() => {
+                console.log("hideNonStickyNotification .. remove");
                 this.hideNonStickyNotification(id);
             }, this.cfg.notificationLifetime);
         }

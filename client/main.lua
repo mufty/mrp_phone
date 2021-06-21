@@ -74,6 +74,7 @@ function OpenPhone()
     
 	TriggerServerEvent('mrp_phone:reload', PhoneData.phoneNumber)
 
+
 	SendNUIMessage({
 		showPhone = true,
 		phoneData = PhoneData
@@ -82,6 +83,7 @@ function OpenPhone()
 	GUI.PhoneIsShowed = true
 
 	SetNuiFocus(true, true)
+    SetNuiFocusKeepInput(true)
 
     PhonePlayIn()
 end
@@ -92,6 +94,7 @@ function ClosePhone()
 	})
 
 	SetNuiFocus(false)
+    SetNuiFocusKeepInput(false)
 	GUI.PhoneIsShowed = false
 	PhonePlayOut()
 end
