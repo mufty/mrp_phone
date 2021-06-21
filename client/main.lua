@@ -258,7 +258,7 @@ AddEventHandler('mrp_phone:onMessage', function(phoneNumber, message, anon)
 		playNotificationSound = true
 	})
 
-    TriggerEvent('mrp_phone:showNotification', ('~b~%s:~s~ %s'):format(msgFrom, message), 'new_message')
+    TriggerEvent('mrp_phone:showNotification', ('%s: %s'):format(msgFrom, message), 'new_message')
 
 	PlaySound(-1, 'Menu_Accept', 'Phone_SoundSet_Default', false, 0, true)
 

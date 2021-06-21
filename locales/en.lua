@@ -12,7 +12,7 @@ Locales['en'] = {
   ['invalid_number'] = 'that\'s not an valid number!',
   ['get_contacts_error'] = 'unable to get contacts!',
   ['annonymous'] = 'anonymous',
-  ['call_started'] = 'Started a call end with ~b~E',
-  ['call_inc'] = 'Incoming call form %s with number %s pickup with ~b~E ',
+  ['call_started'] = 'Started a call end with E',
+  ['call_inc'] = 'Incoming call form %s with number %s pickup with E ',
   ['call_ended'] = 'Call ended',
 }
