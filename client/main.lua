@@ -15,12 +15,16 @@ Citizen.CreateThread(function()
 end)
 
 RegisterCommand('togglePhone', function()
-    GUI.PhoneIsShowed = not GUI.PhoneIsShowed
-    if GUI.PhoneIsShowed then
-        OpenPhone()
-    else
-        ClosePhone()
-    end
+    TriggerEvent('mrp:inventory:client:hasItem', 'phone', function(count)
+        if count >= 1 then
+            GUI.PhoneIsShowed = not GUI.PhoneIsShowed
+            if GUI.PhoneIsShowed then
+                OpenPhone()
+            else
+                ClosePhone()
+            end
+        end
+    end)
 end, false)
 RegisterKeyMapping('togglePhone', 'Open phone', 'keyboard', 'b')
 
