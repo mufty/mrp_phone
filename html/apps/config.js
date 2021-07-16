@@ -26,6 +26,14 @@ Config = {
             ringtone: 'https://www.youtube.com/embed/pe1ZXh5_wk4',
             notification: 'https://www.youtube.com/embed/AiMbf0ovXT4'
         },
+        jobs: {
+            menuId: 'phone-icon-jobs',
+            template: 'jobs/templates/screen.html',
+            extraTemplates: ['jobs/templates/job.html'],
+            scripts: ['jobs/scripts/jobs.js'],
+            style: 'jobs/style.css',
+            locale: 'jobs/locale.js',
+        },
         notifications: {
             template: 'notifications/templates/screen.html',
             extraTemplates: ['notifications/templates/notification.html'],
@@ -44,6 +52,7 @@ Locale = {
         message: "Messages",
         contact: "Contacts",
         settings: "Settings",
+        jobs: "Jobs",
         cancel: "Cancel",
         annonymous: "Annonymous",
         unknown: "Unknown",

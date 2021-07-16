@@ -9,7 +9,7 @@ local incCall = false
 
 Citizen.CreateThread(function()
 	while MRP == nil do
-		TriggerEvent('mrp:getSharedObject', function(obj) MRP = obj end)
+		TriggerEvent('mrp:employment:getSharedObject', function(obj) MRP = obj end)
 		Citizen.Wait(0)
 	end
 end)
@@ -98,7 +98,8 @@ AddEventHandler('mrp_phone:loaded', function(phoneNumber, contacts, settings)
 	PhoneData.phoneNumber = phoneNumber
 	PhoneData.contacts = {}
     PhoneData.settings = settings
-
+    PhoneData.employment = MRP.employment.getEmployment()
+    print(PhoneData.employment)
 	for i=1, #contacts, 1 do
 		table.insert(PhoneData.contacts, contacts[i])
 	end

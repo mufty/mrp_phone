@@ -1,0 +1,12 @@
+#phone-icon-jobs {
+    background-image: url("../../img/icons/jobs.png");
+}
+
+#jobs .jobs-list .job {
+    margin: 10px;
+}
+
+#jobs .jobs-list .job .businessName {
+    font-weight: bold;
+    font-size: 20px;
+}

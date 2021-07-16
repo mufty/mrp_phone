@@ -27,8 +27,7 @@ files {
 
 	'html/css/app.css',
 
-	'html/scripts/mustache.min.js',
-	'html/scripts/app.js',
+	'html/scripts/*.js',
 
 	'html/img/*.png',
 
@@ -38,4 +37,4 @@ files {
     'html/apps/**/*.css',
 }
 
-dependency 'mrp_core'
+dependency 'mrp_employment'
