@@ -70,7 +70,6 @@ function OpenPhone()
     
     PhoneData.employment = MRP.employment.getEmployment()
 
-
 	SendNUIMessage({
 		showPhone = true,
 		phoneData = PhoneData
