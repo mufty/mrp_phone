@@ -29,6 +29,9 @@ class Jobs {
         this.open = false;
         this.jobs = [];
         this.detailsOpen = false;
+        this.manageMenuOpen = false;
+        this.dataOpened = null;
+        this.editEmployeeOpened = false;
     }
 
     event(data) {
@@ -99,10 +102,13 @@ class Jobs {
     renderDetails(data) {
         let jobHTML = $('<div></div>');
 
-        console.log(data);
         for (let employee of data) {
 
             let html = $(Mustache.render(this.cfg.extraTemplates[1], employee));
+
+            html.find('.edit').click(function() {
+                this.editEmployee(employee);
+            }.bind(this));
 
             jobHTML.append(html);
         }
@@ -110,13 +116,37 @@ class Jobs {
         $('#phone #jobDetails .business-detail').html(jobHTML);
     }
 
+    editEmployee(employee) {
+        console.log(employee);
+        $('#employeeDetails').addClass('active');
+        $('.screen *').attr('disabled', 'disabled');
+        $('.screen.active *').removeAttr('disabled');
+
+        this.editEmployeeOpened = true;
+
+        let data = {};
+
+        Object.assign(data, employee, {
+            locale: this.locale
+        });
+
+        let html = $(Mustache.render(this.cfg.extraTemplates[2], data));
+
+        if (this.dataOpened) {
+            //TODO
+        }
+
+        $('#phone #employeeDetails .container').html(html);
+    }
+
     showDetails(job) {
         $('#jobDetails').addClass('active');
         $('.screen *').attr('disabled', 'disabled');
         $('.screen.active *').removeAttr('disabled');
         this.detailsOpen = true;
+        this.dataOpened = job;
 
-        $('#jobDetails .head-screen .businessLabel').html(job.business.name);
+        $('.head-screen .businessLabel').html(job.business.name);
 
         $.post('http://mrp_phone/business_get_employees', JSON.stringify(job), (data) => {
             if (data && data.length > 0)
@@ -132,6 +162,9 @@ class Jobs {
     hideJobDetails() {
         $('#jobDetails').removeClass('active');
         this.detailsOpen = false;
+        this.dataOpened = null;
+        if (this.manageMenuOpen)
+            this.toggleManageMenu();
     }
 
     back() {
@@ -149,15 +182,22 @@ class Jobs {
         this.hideJobDetails();
     }
 
+    toggleManageMenu() {
+        this.manageMenuOpen = !this.manageMenuOpen;
+        if (this.manageMenuOpen)
+            $('#jobDetails .dropdown').show();
+        else
+            $('#jobDetails .dropdown').hide();
+    }
+
     init() {
         let html = $(Mustache.render(this.cfg.template, {
             locale: this.locale
         }));
 
         //add actions
-        html.find('#btn-head-back-msg').click(this.back.bind(this));
-        /*html.find('#btn-head-back-writer, #writer_cancel').click(this.msgBack.bind(this));
-        html.find('#writer_send').click(this.sendMessage.bind(this));*/
+        html.find('.btn-head-back-jobs').click(this.back.bind(this));
+        html.find('#btn-head-manage-business').click(this.toggleManageMenu.bind(this));
 
         return html;
     }

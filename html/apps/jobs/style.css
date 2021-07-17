@@ -20,13 +20,56 @@
     font-size: 16px;
 }
 
-.employee .fire {
+.employee .edit {
+    background-image: url(../../img/icons/edit.png);
+    background-repeat: no-repeat;
+    width: 32px;
+    height: 32px;
     position: absolute;
     right: 3px;
-    top: 2px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
 }
 
 .employee {
     position: relative;
     width: 100%;
+}
+
+.dropdown {
+    position: absolute;
+    display: none;
+    width: 100%;
+}
+
+.dropdown-content {
+    right: 0;
+    display: block;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgb(0 0 0 / 20%);
+    padding: 5px 5px;
+    z-index: 1;
+}
+
+.dropdown-content p:hover {
+    background-color: #DDE1E8;
+}
+
+#employeeDetails #job_save {
+    background-color: #d9534f;
+}
+
+#employeeDetails #job_fire:hover {
+    background-color: #74c374;
+}
+
+#employeeDetails #job_save:hover {
+    background-color: #dc6b68;
+}
+
+#employeeDetails #job_fire {
+    background-color: #5cb85c;
 }
