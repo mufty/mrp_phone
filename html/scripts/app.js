@@ -78,7 +78,7 @@ $(function() {
         }
         if (appCfg.extraTemplates && appCfg.extraTemplates.length > 0) {
             for (let i in appCfg.extraTemplates) {
-                let tmplUrl = appCfg.extraTemplates;
+                let tmplUrl = appCfg.extraTemplates[i];
                 //load extras templates
                 $.ajax(`apps/${tmplUrl}`).done(data => {
                     appCfg.extraTemplates[i] = data;

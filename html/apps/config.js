@@ -29,7 +29,7 @@ Config = {
         jobs: {
             menuId: 'phone-icon-jobs',
             template: 'jobs/templates/screen.html',
-            extraTemplates: ['jobs/templates/job.html'],
+            extraTemplates: ['jobs/templates/job.html', 'jobs/templates/businessDetails.html'],
             scripts: ['jobs/scripts/jobs.js'],
             style: 'jobs/style.css',
             locale: 'jobs/locale.js',

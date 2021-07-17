@@ -6,7 +6,27 @@
     margin: 10px;
 }
 
+#jobs .jobs-list div.job:hover {
+    background-color: #ffffff;
+}
+
 #jobs .jobs-list .job .businessName {
     font-weight: bold;
     font-size: 20px;
+}
+
+.employee .playerName {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.employee .fire {
+    position: absolute;
+    right: 3px;
+    top: 2px;
+}
+
+.employee {
+    position: relative;
+    width: 100%;
 }

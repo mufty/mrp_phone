@@ -28,6 +28,7 @@ class Jobs {
         this.locale = {};
         this.open = false;
         this.jobs = [];
+        this.detailsOpen = false;
     }
 
     event(data) {
@@ -38,7 +39,7 @@ class Jobs {
 
     reloadPhone(phoneData) {
         this.jobs = [];
-        console.log(phoneData);
+        this.detailsOpen = false;
         if (phoneData.employment) {
             for (let emp of phoneData.employment.employment) {
                 let business = null;
@@ -56,6 +57,7 @@ class Jobs {
 
                 this.jobs.push({
                     role: emp.role,
+                    employmentBusiness: emp.business,
                     business: business
                 });
             }
@@ -65,7 +67,7 @@ class Jobs {
     }
 
     renderJobs() {
-        let jobHTML = '';
+        let jobHTML = $('<div></div>');
 
         if (this.jobs.length > 0) {
 
@@ -76,16 +78,50 @@ class Jobs {
                     role: job.role
                 }
 
-                let html = Mustache.render(this.cfg.extraTemplates[0], view);
+                let html = $(Mustache.render(this.cfg.extraTemplates[0], view));
 
-                jobHTML += html;
+                let onclick = function() {
+                    this.showDetails(job);
+                };
+
+                html.click(onclick.bind(this));
+
+                jobHTML.append(html);
             }
 
         } else {
-            jobHTML = '<div class="job no-item"><p class="no-item">' + this.locale.unemployed + '</p></div>';
+            jobHTML = $('<div class="job no-item"><p class="no-item">' + this.locale.unemployed + '</p></div>');
         }
 
         $('#phone #jobs .jobs-list').html(jobHTML);
+    }
+
+    renderDetails(data) {
+        let jobHTML = $('<div></div>');
+
+        console.log(data);
+        for (let employee of data) {
+
+            let html = $(Mustache.render(this.cfg.extraTemplates[1], employee));
+
+            jobHTML.append(html);
+        }
+
+        $('#phone #jobDetails .business-detail').html(jobHTML);
+    }
+
+    showDetails(job) {
+        $('#jobDetails').addClass('active');
+        $('.screen *').attr('disabled', 'disabled');
+        $('.screen.active *').removeAttr('disabled');
+        this.detailsOpen = true;
+
+        $('#jobDetails .head-screen .businessLabel').html(job.business.name);
+
+        $.post('http://mrp_phone/business_get_employees', JSON.stringify(job), (data) => {
+            if (data && data.length > 0)
+                this.renderDetails(data);
+        });
     }
 
     hideJobs() {
@@ -95,11 +131,18 @@ class Jobs {
 
     hideJobDetails() {
         $('#jobDetails').removeClass('active');
+        this.detailsOpen = false;
     }
 
     back() {
-        this.hideJobs();
-        this.hideJobDetails();
+        if (this.detailsOpen) {
+            this.hideJobDetails();
+            $('#job').addClass('active');
+            $('.screen *').attr('disabled', 'disabled');
+            $('.screen.active *').removeAttr('disabled');
+        } else {
+            this.hideJobs();
+        }
     }
 
     msgBack() {

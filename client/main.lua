@@ -170,6 +170,7 @@ RegisterNUICallback('add_contact', function(data, cb)
 	else
         TriggerEvent('mrp_phone:showNotification', _U('invalid_number'), 'invalid_number')
 	end
+    cb({})
 end)
 
 RegisterNUICallback('remove_contact', function(data, cb)
@@ -179,6 +180,13 @@ RegisterNUICallback('remove_contact', function(data, cb)
 	if phoneNumber then
 		TriggerServerEvent('mrp_phone:removePlayerContact', phoneNumber, contactName)
 	end
+    cb({})
+end)
+
+RegisterNUICallback('business_get_employees', function(job, cb)
+    MRP.TriggerServerCallback('mrp:employment:server:getEmployees', {job.employmentBusiness}, function(employees)
+        cb(employees)
+    end)
 end)
 
 AddEventHandler('mrp_phone:showNotification', function(message, id, sticky)
