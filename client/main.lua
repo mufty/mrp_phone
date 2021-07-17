@@ -99,7 +99,7 @@ AddEventHandler('mrp_phone:loaded', function(phoneNumber, contacts, settings)
 	PhoneData.contacts = {}
     PhoneData.settings = settings
     PhoneData.employment = MRP.employment.getEmployment()
-    print(PhoneData.employment)
+    
 	for i=1, #contacts, 1 do
 		table.insert(PhoneData.contacts, contacts[i])
 	end
