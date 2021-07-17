@@ -67,6 +67,8 @@ function OpenPhone()
     end
     
 	TriggerServerEvent('mrp_phone:reload', PhoneData.phoneNumber)
+    
+    PhoneData.employment = MRP.employment.getEmployment()
 
 
 	SendNUIMessage({
