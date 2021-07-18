@@ -56,6 +56,7 @@ Locale = {
         cancel: "Cancel",
         annonymous: "Annonymous",
         unknown: "Unknown",
-        save: "Save"
+        save: "Save",
+        delete: "Delete"
     }
 };

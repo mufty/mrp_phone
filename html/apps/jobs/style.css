@@ -61,18 +61,22 @@
     background-color: #DDE1E8;
 }
 
-#employeeDetails #job_fire {
+#employeeDetails #job_fire,
+#jobRolesEdit #deleteRole {
     background-color: #d9534f;
 }
 
-#employeeDetails #job_save:hover, #employForm #employCharacter:hover {
+#employeeDetails #job_save:hover, #employForm #employCharacter:hover,
+#jobRolesEdit #saveRole:hover {
     background-color: #74c374;
 }
 
-#employeeDetails #job_fire:hover {
+#employeeDetails #job_fire:hover,
+#jobRolesEdit #deleteRole:hover {
     background-color: #dc6b68;
 }
 
-#employeeDetails #job_save, #employForm #employCharacter {
+#employeeDetails #job_save, #employForm #employCharacter,
+#jobRolesEdit #saveRole {
     background-color: #5cb85c;
 }

@@ -67,3 +67,34 @@
         </div>
     </div>
 </div>
+
+<div id="jobRolesEdit" class="screen">
+    <div class="head-screen">
+        <span class="btn-head-back-jobs btn-head btn-head-back"></span><span class="businessLabel"></span>
+    </div>
+    <div class="container">
+        <p>
+            <label>{{locale.role}}<input type="text" id="roleName" disabled="true"></label>
+        </p>
+        <p>
+            <label class="editRoleSecurity">{{locale.canHire}}<input type="checkbox" id="canHire"></label>
+        </p>
+        <p>
+            <label class="editRoleSecurity">{{locale.canFire}}<input type="checkbox" id="canFire"></label>
+        </p>
+        <p>
+            <label class="editRoleSecurity">{{locale.canAddRole}}<input type="checkbox" id="canAddRole"></label>
+        </p>
+        <p>
+            <label class="editRoleSecurity">{{locale.canDeleteRole}}<input type="checkbox" id="canDeleteRole"></label>
+        </p>
+        <p>
+            <label class="editRoleSecurity">{{locale.canChangeRole}}<input type="checkbox" id="canChangeRole"></label>
+        </p>
+        <p>
+            <label class="editRoleSecurity">{{locale.canPromote}}<input type="checkbox" id="canPromote"></label>
+        </p>
+        <button id="deleteRole">{{locale.delete}}</button>
+        <button id="saveRole" class="marged">{{locale.save}}</button>
+    </div>
+</div>

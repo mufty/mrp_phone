@@ -7,6 +7,12 @@ Locale['jobs'] = {
         fire: "Fire",
         role: "Role",
         stateId: "State ID",
-        addRole: "Add role"
+        addRole: "Add role",
+        canHire: "Hire",
+        canFire: "Fire",
+        canAddRole: "Add role",
+        canDeleteRole: "Delete role",
+        canChangeRole: "Edit role",
+        canPromote: "Promote"
     }
 };

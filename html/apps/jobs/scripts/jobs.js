@@ -35,6 +35,7 @@ class Jobs {
         this.editEmployeeOpened = false;
         this.employOpened = false;
         this.rolesListOpened = false;
+        this.roleEditOpened = false;
     }
 
     event(data) {
@@ -219,6 +220,9 @@ class Jobs {
         } else if (this.rolesListOpened) {
             this.hideManageRoles();
             this.showDetails(this.dataOpened);
+        } else if (this.roleEditOpened) {
+            this.hideEditRole();
+            this.showManageRoles();
         } else {
             this.hideJobs();
         }
@@ -296,7 +300,8 @@ class Jobs {
     }
 
     showManageRoles() {
-        this.toggleManageMenu();
+        this.manageMenuOpen = false;
+        $('#jobDetails .dropdown').hide();
         this.rolesListOpened = true;
         this.detailsOpen = false;
         $('#jobRolesDetails').addClass('active');
@@ -308,9 +313,51 @@ class Jobs {
             for (let role of this.dataOpened.business.roles) {
                 let html = $(Mustache.render(this.cfg.extraTemplates[3], role));
                 $('#jobRolesDetails .roles-list').append(html);
+                html.find('.edit').click(function() {
+                    this.editRole(role);
+                }.bind(this));
             }
         } else {
             $('#jobRolesDetails .editRole').hide();
+        }
+    }
+
+    hideEditRole() {
+        $('#jobRolesDetails .dropdown').hide();
+        this.manageRolesOpen = false;
+        $('#jobRolesEdit').removeClass('active');
+        this.roleEditOpened = false;
+    }
+
+    editRole(role) {
+        this.rolesListOpened = false;
+        this.roleEditOpened = true;
+        $('#jobRolesEdit').addClass('active');
+        $('.screen *').attr('disabled', 'disabled');
+        $('.screen.active *').removeAttr('disabled');
+
+        if (role) {
+            if (role.name == 'owner')
+                $('#deleteRole').hide(); //TODO don't allow deletion of owner role
+
+            $('#roleName').prop("disabled", true);
+            $('#roleName').val(role.name);
+            $('#canHire').val(role.canHire);
+            $('#canFire').val(role.canFire);
+            $('#canAddRole').val(role.canAddRole);
+            $('#canDeleteRole').val(role.canDeleteRole);
+            $('#canChangeRole').val(role.canChangeRole);
+            $('#canPromote').val(role.canPromote);
+        } else {
+            $('#deleteRole').hide();
+            $('#roleName').prop("disabled", false);
+            $('#roleName').val("");
+            $('#canHire').val(false);
+            $('#canFire').val(false);
+            $('#canAddRole').val(false);
+            $('#canDeleteRole').val(false);
+            $('#canChangeRole').val(false);
+            $('#canPromote').val(false);
         }
     }
 
@@ -326,6 +373,9 @@ class Jobs {
         html.find('p.employ').click(this.showEmployForm.bind(this));
         html.find('#employCharacter').click(this.employStateId.bind(this));
         html.find('p.manageRoles').click(this.showManageRoles.bind(this));
+        html.find('p.addRole').click(function() {
+            this.editRole();
+        }.bind(this));
 
         return html;
     }
