@@ -6,6 +6,7 @@ Locale['jobs'] = {
         manageRoles: "Manage roles",
         fire: "Fire",
         role: "Role",
-        stateId: "State ID"
+        stateId: "State ID",
+        addRole: "Add role"
     }
 };

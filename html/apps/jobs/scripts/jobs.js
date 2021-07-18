@@ -30,14 +30,20 @@ class Jobs {
         this.jobs = [];
         this.detailsOpen = false;
         this.manageMenuOpen = false;
+        this.manageRolesOpen = false;
         this.dataOpened = null;
         this.editEmployeeOpened = false;
         this.employOpened = false;
+        this.rolesListOpened = false;
     }
 
     event(data) {
         if (data.reloadPhone === true) {
             this.reloadPhone(data.phoneData);
+        }
+        if (data.updateDetails && this.detailsOpen) {
+            //refresh details
+            this.showDetails(this.dataOpened);
         }
     }
 
@@ -164,7 +170,9 @@ class Jobs {
     }
 
     showDetails(job) {
-        $('#jobDetails').addClass('active');
+        if (!$("#jobDetails").hasClass("active")) {
+            $('#jobDetails').addClass('active');
+        }
         $('.screen *').attr('disabled', 'disabled');
         $('.screen.active *').removeAttr('disabled');
         this.detailsOpen = true;
@@ -208,6 +216,9 @@ class Jobs {
         } else if (this.employOpened) {
             this.hideEmployForm();
             this.showDetails(this.dataOpened);
+        } else if (this.rolesListOpened) {
+            this.hideManageRoles();
+            this.showDetails(this.dataOpened);
         } else {
             this.hideJobs();
         }
@@ -223,6 +234,14 @@ class Jobs {
             $('#jobDetails .dropdown').show();
         else
             $('#jobDetails .dropdown').hide();
+    }
+
+    toggleManageRolesMenu() {
+        this.manageRolesOpen = !this.manageRolesOpen;
+        if (this.manageRolesOpen)
+            $('#jobRolesDetails .dropdown').show();
+        else
+            $('#jobRolesDetails .dropdown').hide();
     }
 
     hideEmployForm() {
@@ -269,8 +288,20 @@ class Jobs {
         });
     }
 
+    hideManageRoles() {
+        $('#jobRolesDetails .dropdown').hide();
+        this.manageRolesOpen = false;
+        $('#jobRolesDetails').removeClass('active');
+        this.rolesListOpened = false;
+    }
+
     showManageRoles() {
-        //TODO
+        this.toggleManageMenu();
+        this.rolesListOpened = true;
+        this.detailsOpen = false;
+        $('#jobRolesDetails').addClass('active');
+        $('.screen *').attr('disabled', 'disabled');
+        $('.screen.active *').removeAttr('disabled');
     }
 
     init() {
@@ -281,9 +312,10 @@ class Jobs {
         //add actions
         html.find('.btn-head-back-jobs').click(this.back.bind(this));
         html.find('#btn-head-manage-business').click(this.toggleManageMenu.bind(this));
+        html.find('#btn-head-manage-roles').click(this.toggleManageRolesMenu.bind(this));
         html.find('p.employ').click(this.showEmployForm.bind(this));
         html.find('#employCharacter').click(this.employStateId.bind(this));
-        html.find('#btn-head-manage-business .manageRoles').click(this.showManageRoles.bind(this));
+        html.find('p.manageRoles').click(this.showManageRoles.bind(this));
 
         return html;
     }

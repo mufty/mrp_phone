@@ -370,6 +370,16 @@ AddEventHandler('onResourceStop', function(resource)
 	end
 end)
 
+RegisterNetEvent('mrp:employment:server:employmentChanged')
+AddEventHandler('mrp:employment:server:employmentChanged', function(data)
+    if GUI.PhoneIsShowed then
+        SendNUIMessage({
+            app           = 'jobs',
+            updateDetails = true
+        })
+    end
+end)
+
 RegisterNUICallback('fire_employee', function(data, cb)
     TriggerServerEvent('mrp:employment:server:removeEmployment', GetPlayerServerId(PlayerId()), data.char.stateId, data.employment.business, data.employment.role)
     cb({})
