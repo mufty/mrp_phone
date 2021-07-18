@@ -370,10 +370,17 @@ AddEventHandler('onResourceStop', function(resource)
 	end
 end)
 
-RegisterNUICallback('fire_employee', function(data)
+RegisterNUICallback('fire_employee', function(data, cb)
     TriggerServerEvent('mrp:employment:server:removeEmployment', GetPlayerServerId(PlayerId()), data.char.stateId, data.employment.business, data.employment.role)
+    cb({})
 end)
 
-RegisterNUICallback('update_role', function(data)
+RegisterNUICallback('update_role', function(data, cb)
     TriggerServerEvent('mrp:employment:server:addEmployment', GetPlayerServerId(PlayerId()), data.char.stateId, data.employment.business, data.employment.role)
+    cb({})
+end)
+
+RegisterNUICallback('employ', function(data, cb)
+    TriggerServerEvent('mrp:employment:server:addEmployment', GetPlayerServerId(PlayerId()), data.stateId, data.business, data.role)
+    cb({})
 end)

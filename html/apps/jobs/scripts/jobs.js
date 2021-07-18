@@ -32,6 +32,7 @@ class Jobs {
         this.manageMenuOpen = false;
         this.dataOpened = null;
         this.editEmployeeOpened = false;
+        this.employOpened = false;
     }
 
     event(data) {
@@ -148,9 +149,8 @@ class Jobs {
         }.bind(this));
 
         $('#employeeDetails .editRole').show();
-
+        $('#employeeDetails #rolesCombo').empty();
         if (this.dataOpened && this.dataOpened.business && this.dataOpened.business.roles) {
-            $('#employeeDetails #rolesCombo').empty();
             for (let role of this.dataOpened.business.roles) {
                 let safeName = role.name.replaceAll(" ", "_");
                 let optionHTML = $('<option value="' + safeName + '">' + role.name + '</option>');
@@ -205,6 +205,9 @@ class Jobs {
         } else if (this.editEmployeeOpened) {
             this.hideEditEmployee();
             this.showDetails(this.dataOpened);
+        } else if (this.employOpened) {
+            this.hideEmployForm();
+            this.showDetails(this.dataOpened);
         } else {
             this.hideJobs();
         }
@@ -222,6 +225,54 @@ class Jobs {
             $('#jobDetails .dropdown').hide();
     }
 
+    hideEmployForm() {
+        $('#employForm').removeClass('active');
+        this.employOpened = false;
+    }
+
+    showEmployForm() {
+        this.toggleManageMenu();
+        this.employOpened = true;
+        this.detailsOpen = false;
+        $('#employForm').addClass('active');
+        $('.screen *').attr('disabled', 'disabled');
+        $('.screen.active *').removeAttr('disabled');
+
+        $('#employForm .editRole').show();
+        $('#employForm #employRole').empty();
+        $('#employForm #stateId').val("");
+        if (this.dataOpened && this.dataOpened.business && this.dataOpened.business.roles) {
+            for (let role of this.dataOpened.business.roles) {
+                let safeName = role.name.replaceAll(" ", "_");
+                let optionHTML = $('<option value="' + safeName + '">' + role.name + '</option>');
+                $('#employForm #employRole').append(optionHTML);
+            }
+        } else {
+            $('#employForm .editRole').hide();
+        }
+    }
+
+    employStateId() {
+        let stateId = $('#employForm #stateId').val();
+        let role = $('#employRole').val();
+
+        let data = {
+            stateId: parseInt(stateId),
+            role: role,
+            business: this.dataOpened.employmentBusiness
+        };
+
+        console.log(data);
+
+        $.post('http://mrp_phone/employ', JSON.stringify(data), (data) => {
+            this.back();
+        });
+    }
+
+    showManageRoles() {
+        //TODO
+    }
+
     init() {
         let html = $(Mustache.render(this.cfg.template, {
             locale: this.locale
@@ -230,6 +281,9 @@ class Jobs {
         //add actions
         html.find('.btn-head-back-jobs').click(this.back.bind(this));
         html.find('#btn-head-manage-business').click(this.toggleManageMenu.bind(this));
+        html.find('p.employ').click(this.showEmployForm.bind(this));
+        html.find('#employCharacter').click(this.employStateId.bind(this));
+        html.find('#btn-head-manage-business .manageRoles').click(this.showManageRoles.bind(this));
 
         return html;
     }

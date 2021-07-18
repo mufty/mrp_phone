@@ -5,6 +5,7 @@ Locale['jobs'] = {
         employ: "Hire",
         manageRoles: "Manage roles",
         fire: "Fire",
-        role: "Role"
+        role: "Role",
+        stateId: "State ID"
     }
 };

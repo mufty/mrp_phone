@@ -62,7 +62,7 @@
     background-color: #d9534f;
 }
 
-#employeeDetails #job_save:hover {
+#employeeDetails #job_save:hover, #employForm #employCharacter:hover {
     background-color: #74c374;
 }
 
@@ -70,6 +70,6 @@
     background-color: #dc6b68;
 }
 
-#employeeDetails #job_save {
+#employeeDetails #job_save, #employForm #employCharacter {
     background-color: #5cb85c;
 }
