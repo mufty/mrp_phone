@@ -58,18 +58,18 @@
     background-color: #DDE1E8;
 }
 
-#employeeDetails #job_save {
+#employeeDetails #job_fire {
     background-color: #d9534f;
 }
 
-#employeeDetails #job_fire:hover {
+#employeeDetails #job_save:hover {
     background-color: #74c374;
 }
 
-#employeeDetails #job_save:hover {
+#employeeDetails #job_fire:hover {
     background-color: #dc6b68;
 }
 
-#employeeDetails #job_fire {
+#employeeDetails #job_save {
     background-color: #5cb85c;
 }

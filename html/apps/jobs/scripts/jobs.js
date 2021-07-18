@@ -117,12 +117,12 @@ class Jobs {
     }
 
     editEmployee(employee) {
-        console.log(employee);
         $('#employeeDetails').addClass('active');
         $('.screen *').attr('disabled', 'disabled');
         $('.screen.active *').removeAttr('disabled');
 
         this.editEmployeeOpened = true;
+        this.detailsOpen = false;
 
         let data = {};
 
@@ -132,11 +132,35 @@ class Jobs {
 
         let html = $(Mustache.render(this.cfg.extraTemplates[2], data));
 
-        if (this.dataOpened) {
-            //TODO
-        }
-
         $('#phone #employeeDetails .container').html(html);
+
+        $('#phone #employeeDetails #job_fire').click(function() {
+            $.post('http://mrp_phone/fire_employee', JSON.stringify(employee));
+            this.back();
+        }.bind(this));
+        $('#phone #employeeDetails #job_save').click(function() {
+            let roleValue = $('#employeeDetails #rolesCombo').val();
+            if (roleValue)
+                employee.employment.role = $('#employeeDetails #rolesCombo').val().replaceAll("_", " ");
+
+            $.post('http://mrp_phone/update_role', JSON.stringify(employee));
+            this.back();
+        }.bind(this));
+
+        $('#employeeDetails .editRole').show();
+
+        if (this.dataOpened && this.dataOpened.business && this.dataOpened.business.roles) {
+            $('#employeeDetails #rolesCombo').empty();
+            for (let role of this.dataOpened.business.roles) {
+                let safeName = role.name.replaceAll(" ", "_");
+                let optionHTML = $('<option value="' + safeName + '">' + role.name + '</option>');
+                $('#employeeDetails #rolesCombo').append(optionHTML);
+            }
+            let safeName = employee.employment.role.replaceAll(" ", "_");
+            $('#employeeDetails #rolesCombo').val(safeName);
+        } else {
+            $('#employeeDetails .editRole').hide();
+        }
     }
 
     showDetails(job) {
@@ -167,12 +191,20 @@ class Jobs {
             this.toggleManageMenu();
     }
 
+    hideEditEmployee() {
+        $('#employeeDetails').removeClass('active');
+        this.editEmployeeOpened = false;
+    }
+
     back() {
         if (this.detailsOpen) {
             this.hideJobDetails();
             $('#job').addClass('active');
             $('.screen *').attr('disabled', 'disabled');
             $('.screen.active *').removeAttr('disabled');
+        } else if (this.editEmployeeOpened) {
+            this.hideEditEmployee();
+            this.showDetails(this.dataOpened);
         } else {
             this.hideJobs();
         }
