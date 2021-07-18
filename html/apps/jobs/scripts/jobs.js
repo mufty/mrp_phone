@@ -302,6 +302,16 @@ class Jobs {
         $('#jobRolesDetails').addClass('active');
         $('.screen *').attr('disabled', 'disabled');
         $('.screen.active *').removeAttr('disabled');
+
+        $('#jobRolesDetails .roles-list').empty();
+        if (this.dataOpened && this.dataOpened.business && this.dataOpened.business.roles) {
+            for (let role of this.dataOpened.business.roles) {
+                let html = $(Mustache.render(this.cfg.extraTemplates[3], role));
+                $('#jobRolesDetails .roles-list').append(html);
+            }
+        } else {
+            $('#jobRolesDetails .editRole').hide();
+        }
     }
 
     init() {

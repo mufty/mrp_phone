@@ -15,12 +15,14 @@
     font-size: 20px;
 }
 
-.employee .playerName {
+.employee .playerName,
+.roleItem .role {
     font-weight: bold;
     font-size: 16px;
 }
 
-.employee .edit {
+.employee .edit,
+.roleItem .edit {
     background-image: url(../../img/icons/edit.png);
     background-repeat: no-repeat;
     width: 32px;
@@ -32,7 +34,8 @@
     height: 16px;
 }
 
-.employee {
+.employee,
+.roleItem {
     position: relative;
     width: 100%;
 }
