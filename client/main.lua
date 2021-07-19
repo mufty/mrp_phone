@@ -394,3 +394,8 @@ RegisterNUICallback('employ', function(data, cb)
     TriggerServerEvent('mrp:employment:server:addEmployment', GetPlayerServerId(PlayerId()), data.stateId, data.business, data.role)
     cb({})
 end)
+
+RegisterNUICallback('update_business', function(data, cb)
+    TriggerServerEvent('mrp:business:server:update', GetPlayerServerId(PlayerId()), data)
+    cb({})
+end)

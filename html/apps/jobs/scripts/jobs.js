@@ -361,6 +361,50 @@ class Jobs {
         }
     }
 
+    updateRoles(business, role, del) {
+        if (!business || !role)
+            return;
+
+        if (!business.roles)
+            business.roles = [];
+
+        let newRoles = []
+        for (let r of business.roles) {
+            if (r.name == role.name && !del)
+                newRoles.push(role);
+            else if (!del)
+                newRoles.push(r);
+        }
+
+        if (newRoles.length == 0 && !del)
+            newRoles.push(role);
+
+        business.roles = newRoles;
+    }
+
+    saveRole() {
+        let roleData = {
+            name: $('#roleName').val(),
+            canHire: $('#canHire').is(":checked"),
+            canFire: $('#canFire').is(":checked"),
+            canAddRole: $('#canAddRole').is(":checked"),
+            canDeleteRole: $('#canDeleteRole').is(":checked"),
+            canChangeRole: $('#canChangeRole').is(":checked"),
+            canPromote: $('#canPromote').is(":checked")
+        };
+
+        this.updateRoles(this.dataOpened.business, roleData);
+
+        $.post('http://mrp_phone/update_business', JSON.stringify(this.dataOpened.business));
+
+        this.hideEditRole();
+        this.showManageRoles();
+    }
+
+    deleteRole() {
+
+    }
+
     init() {
         let html = $(Mustache.render(this.cfg.template, {
             locale: this.locale
@@ -376,6 +420,9 @@ class Jobs {
         html.find('p.addRole').click(function() {
             this.editRole();
         }.bind(this));
+        html.find('#saveRole').click(this.saveRole.bind(this));
+        html.find('#deleteRole').click(this.deleteRole.bind(this));
+
 
         return html;
     }
