@@ -168,10 +168,30 @@ class Jobs {
         } else {
             $('#employeeDetails .editRole').hide();
         }
+
+        html.find('#job_fire').hide();
+        html.find('#rolesCombo').prop('disabled', true);
+        if (this.myRole && this.myRole.canFire)
+            html.find('#job_fire').show();
+        if (this.myRole && this.myRole.canPromote)
+            html.find('#rolesCombo').prop('disabled', false);
+    }
+
+    setMyRole(job) {
+        this.myRole = null;
+        if (!job || !job.business || !job.business.roles)
+            return;
+
+        let myRoleName = job.role;
+
+        for (let role of job.business.roles) {
+            if (role.name == myRoleName)
+                this.myRole = role;
+        }
     }
 
     showDetails(job) {
-        console.log(job);
+        this.setMyRole(job);
         if (!$("#jobDetails").hasClass("active")) {
             $('#jobDetails').addClass('active');
         }
@@ -181,6 +201,11 @@ class Jobs {
         this.dataOpened = job;
 
         $('.head-screen .businessLabel').html(job.business.name);
+
+        $('p.employ').hide();
+
+        if (this.myRole && this.myRole.canHire)
+            $('p.employ').show();
 
         $.post('http://mrp_phone/business_get_employees', JSON.stringify(job), (data) => {
             if (data && data.length > 0)
@@ -286,8 +311,6 @@ class Jobs {
             business: this.dataOpened.employmentBusiness
         };
 
-        console.log(data);
-
         $.post('http://mrp_phone/employ', JSON.stringify(data), (data) => {
             this.back();
         });
@@ -317,10 +340,18 @@ class Jobs {
                 html.find('.edit').click(function() {
                     this.editRole(role);
                 }.bind(this));
+
+                html.find('.edit').hide();
+                if (this.myRole && this.myRole.canChangeRole)
+                    html.find('.edit').show();
             }
         } else {
             $('#jobRolesDetails .editRole').hide();
         }
+
+        $('#jobRolesDetails p.addRole').hide();
+        if (this.myRole && this.myRole.canAddRole)
+            $('#jobRolesDetails p.addRole').show();
     }
 
     hideEditRole() {
@@ -362,6 +393,10 @@ class Jobs {
             $('#canChangeRole').prop('checked', false);
             $('#canPromote').prop('checked', false);
         }
+
+        $('#deleteRole').hide();
+        if (this.myRole && this.myRole.canDeleteRole && role)
+            $('#deleteRole').show();
     }
 
     updateRoles(business, role, del) {
@@ -383,8 +418,6 @@ class Jobs {
 
         if ((newRoles.length == 0 && !del) || (!found && !del))
             newRoles.push(role);
-
-        console.log(newRoles);
 
         business.roles = newRoles;
     }
