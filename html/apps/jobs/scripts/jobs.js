@@ -409,7 +409,22 @@ class Jobs {
     }
 
     deleteRole() {
+        let roleData = {
+            name: $('#roleName').val(),
+            canHire: $('#canHire').is(":checked"),
+            canFire: $('#canFire').is(":checked"),
+            canAddRole: $('#canAddRole').is(":checked"),
+            canDeleteRole: $('#canDeleteRole').is(":checked"),
+            canChangeRole: $('#canChangeRole').is(":checked"),
+            canPromote: $('#canPromote').is(":checked")
+        };
 
+        this.updateRoles(this.dataOpened.business, roleData, true);
+
+        $.post('http://mrp_phone/update_business', JSON.stringify(this.dataOpened.business));
+
+        this.hideEditRole();
+        this.showManageRoles();
     }
 
     init() {
