@@ -171,6 +171,7 @@ class Jobs {
     }
 
     showDetails(job) {
+        console.log(job);
         if (!$("#jobDetails").hasClass("active")) {
             $('#jobDetails').addClass('active');
         }
@@ -338,26 +339,28 @@ class Jobs {
 
         if (role) {
             if (role.name == 'owner')
-                $('#deleteRole').hide(); //TODO don't allow deletion of owner role
+                $('#deleteRole').hide();
+            else
+                $('#deleteRole').show();
 
             $('#roleName').prop("disabled", true);
             $('#roleName').val(role.name);
-            $('#canHire').val(role.canHire);
-            $('#canFire').val(role.canFire);
-            $('#canAddRole').val(role.canAddRole);
-            $('#canDeleteRole').val(role.canDeleteRole);
-            $('#canChangeRole').val(role.canChangeRole);
-            $('#canPromote').val(role.canPromote);
+            $('#canHire').prop('checked', role.canHire);
+            $('#canFire').prop('checked', role.canFire);
+            $('#canAddRole').prop('checked', role.canAddRole);
+            $('#canDeleteRole').prop('checked', role.canDeleteRole);
+            $('#canChangeRole').prop('checked', role.canChangeRole);
+            $('#canPromote').prop('checked', role.canPromote);
         } else {
             $('#deleteRole').hide();
             $('#roleName').prop("disabled", false);
             $('#roleName').val("");
-            $('#canHire').val(false);
-            $('#canFire').val(false);
-            $('#canAddRole').val(false);
-            $('#canDeleteRole').val(false);
-            $('#canChangeRole').val(false);
-            $('#canPromote').val(false);
+            $('#canHire').prop('checked', false);
+            $('#canFire').prop('checked', false);
+            $('#canAddRole').prop('checked', false);
+            $('#canDeleteRole').prop('checked', false);
+            $('#canChangeRole').prop('checked', false);
+            $('#canPromote').prop('checked', false);
         }
     }
 
@@ -369,15 +372,19 @@ class Jobs {
             business.roles = [];
 
         let newRoles = []
+        let found = false;
         for (let r of business.roles) {
-            if (r.name == role.name && !del)
+            if (r.name == role.name && !del) {
                 newRoles.push(role);
-            else if (!del)
+                found = true;
+            } else if (r.name != role.name)
                 newRoles.push(r);
         }
 
-        if (newRoles.length == 0 && !del)
+        if ((newRoles.length == 0 && !del) || (!found && !del))
             newRoles.push(role);
+
+        console.log(newRoles);
 
         business.roles = newRoles;
     }
