@@ -382,6 +382,8 @@ class Jobs {
             $('#canDeleteRole').prop('checked', role.canDeleteRole);
             $('#canChangeRole').prop('checked', role.canChangeRole);
             $('#canPromote').prop('checked', role.canPromote);
+            $('#canCreateJobs').prop('checked', role.canCreateJobs);
+            $('#isDefault').prop('checked', role.isDefault);
         } else {
             $('#deleteRole').hide();
             $('#roleName').prop("disabled", false);
@@ -392,6 +394,8 @@ class Jobs {
             $('#canDeleteRole').prop('checked', false);
             $('#canChangeRole').prop('checked', false);
             $('#canPromote').prop('checked', false);
+            $('#canCreateJobs').prop('checked', false);
+            $('#isDefault').prop('checked', false);
         }
 
         $('#deleteRole').hide();
@@ -412,8 +416,11 @@ class Jobs {
             if (r.name == role.name && !del) {
                 newRoles.push(role);
                 found = true;
-            } else if (r.name != role.name)
+            } else if (r.name != role.name) {
+                if (role.isDefault && r.isDefault)
+                    r.isDefault = false;
                 newRoles.push(r);
+            }
         }
 
         if ((newRoles.length == 0 && !del) || (!found && !del))
@@ -430,7 +437,9 @@ class Jobs {
             canAddRole: $('#canAddRole').is(":checked"),
             canDeleteRole: $('#canDeleteRole').is(":checked"),
             canChangeRole: $('#canChangeRole').is(":checked"),
-            canPromote: $('#canPromote').is(":checked")
+            canPromote: $('#canPromote').is(":checked"),
+            canCreateJobs: $('#canCreateJobs').is(":checked"),
+            isDefault: $('#isDefault').is(":checked")
         };
 
         this.updateRoles(this.dataOpened.business, roleData);
@@ -449,7 +458,10 @@ class Jobs {
             canAddRole: $('#canAddRole').is(":checked"),
             canDeleteRole: $('#canDeleteRole').is(":checked"),
             canChangeRole: $('#canChangeRole').is(":checked"),
-            canPromote: $('#canPromote').is(":checked")
+            canCreateJobs: $('#canCreateJobs').is(":checked"),
+            canPromote: $('#canPromote').is(":checked"),
+            canCreateJobs: $('#canCreateJobs').is(":checked"),
+            isDefault: $('#isDefault').is(":checked")
         };
 
         this.updateRoles(this.dataOpened.business, roleData, true);

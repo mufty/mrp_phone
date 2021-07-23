@@ -13,6 +13,8 @@ Locale['jobs'] = {
         canAddRole: "Add role",
         canDeleteRole: "Delete role",
         canChangeRole: "Edit role",
-        canPromote: "Promote"
+        canPromote: "Promote",
+        canCreateJobs: "Create jobs",
+        isDefault: "Default role"
     }
 };
