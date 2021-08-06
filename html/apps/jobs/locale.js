@@ -1,6 +1,6 @@
 Locale['jobs'] = {
     en: {
-        mainLabel: "Jobs",
+        mainLabel: "Business",
         unemployed: "Unemployed",
         employ: "Hire",
         manageRoles: "Manage roles",
