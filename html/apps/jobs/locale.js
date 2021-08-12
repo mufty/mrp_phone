@@ -15,6 +15,7 @@ Locale['jobs'] = {
         canChangeRole: "Edit role",
         canPromote: "Promote",
         canCreateJobs: "Create jobs",
-        isDefault: "Default role"
+        isDefault: "Default role",
+        hasBankAccess: "Has bank access"
     }
 };

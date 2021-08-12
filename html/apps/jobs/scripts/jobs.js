@@ -383,6 +383,7 @@ class Jobs {
             $('#canChangeRole').prop('checked', role.canChangeRole);
             $('#canPromote').prop('checked', role.canPromote);
             $('#canCreateJobs').prop('checked', role.canCreateJobs);
+            $('#hasBankAccess').prop('checked', role.hasBankAccess);
             $('#isDefault').prop('checked', role.isDefault);
         } else {
             $('#deleteRole').hide();
@@ -395,6 +396,7 @@ class Jobs {
             $('#canChangeRole').prop('checked', false);
             $('#canPromote').prop('checked', false);
             $('#canCreateJobs').prop('checked', false);
+            $('#hasBankAccess').prop('checked', false);
             $('#isDefault').prop('checked', false);
         }
 
@@ -439,6 +441,7 @@ class Jobs {
             canChangeRole: $('#canChangeRole').is(":checked"),
             canPromote: $('#canPromote').is(":checked"),
             canCreateJobs: $('#canCreateJobs').is(":checked"),
+            hasBankAccess: $('#hasBankAccess').is(":checked"),
             isDefault: $('#isDefault').is(":checked")
         };
 
@@ -460,7 +463,7 @@ class Jobs {
             canChangeRole: $('#canChangeRole').is(":checked"),
             canCreateJobs: $('#canCreateJobs').is(":checked"),
             canPromote: $('#canPromote').is(":checked"),
-            canCreateJobs: $('#canCreateJobs').is(":checked"),
+            hasBankAccess: $('#hasBankAccess').is(":checked"),
             isDefault: $('#isDefault').is(":checked")
         };
 
